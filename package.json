@@ -1,8 +1,9 @@
 {
     "name": "ethabi",
-    "description"   : "Node-Red - Eth Contract Transaction Node",
+    "description": "Node-Red - Eth Contract Transaction Node",
     "version": "0.0.1",
     "dependencies": {
+        "etherscan-api": "^10.0.5",
         "ethjs": "^0.4.0",
         "ethjs-account": "^0.1.4",
         "ethjs-provider-signer": "^0.1.4",
