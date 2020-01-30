@@ -1,19 +1,11 @@
 {
-    "name": "node-red-contrib-smart-ethjs",
+    "name": "ethabi",
     "description": "Node-Red - smarter eth nodes",
     "version": "0.0.1",
     "dependencies": {
-        "etherscan-api": "^10.0.5",
-        "ethjs": "^0.4.0",
-        "ethjs-account": "^0.1.4",
-        "ethjs-provider-signer": "^0.1.4",
-        "ethjs-signer": "^0.1.1",
-        "node-red-viseo-helper": "^0.3.2"
+        "node-red-contrib-smart-ethjs": "file:./node-red-contrib-smart-ethjs"
     },
     "node-red": {
-        "nodes": {
-            "ethjs-transaction": "node-ethjs-transaction.js"
-        },
         "settings": {
             "flowFile": "flow.json",
             "credentialsFile": "flow_cred.json"

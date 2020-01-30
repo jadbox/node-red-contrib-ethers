@@ -1,0 +1,43 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ethjs-wallet',{
+        category: 'config',
+        defaults: {
+            name:       { value: undefined },
+            keyPublic:  { value: undefined },
+        },
+        credentials: {
+            keyPrivate: { value: undefined },
+        },
+        label: function() {
+            return this.name || "Ethereum Wallet";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="ethjs-wallet">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-keyPublic"><i class="icon-tag"></i> PublicKey</label>
+        <input type="text" id="node-config-input-keyPublic" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-keyPrivate"><i class="fa fa-lock"></i> PrivateKey</label>
+        <input type="text" id="node-config-input-keyPrivate" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="ethjs-wallet">
+
+    <p>[<i>under development</i>]</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href="https://blog.encausse.net/2018/03/28/le-chatbot-comme-interface-de-la-blockchain/">Encausse.net</a> - blog article</li>
+        <li><a href="https://github.com/ethjs/ethjs">EthJS</a> - documentation</li>
+        <li><a href="https://github.com/NGRP/node-red-contrib-viseo/">VISEO BotMaker</a> - the nodes github repository</li>
+    </ul>
+    
+</script>
