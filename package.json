@@ -1,6 +1,6 @@
 {
-    "name": "ethabi",
-    "description": "Node-Red - Eth Contract Transaction Node",
+    "name": "node-red-contrib-smart-ethjs",
+    "description": "Node-Red - smarter eth nodes",
     "version": "0.0.1",
     "dependencies": {
         "etherscan-api": "^10.0.5",
