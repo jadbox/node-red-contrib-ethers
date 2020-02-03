@@ -48,16 +48,44 @@ const input = async (node, data, config) => {
 
     const abi2 = abi.result;
 
-    console.log('abi', abi2);
+    // const r2 = ethers.utils.defaultAbiCoder;
+    var iface = new ethers.utils.Interface(abi2)
+
+    // console.log('iface', iface.functions);
+    const abiFunctions = iface.abi.filter(x=>x.type==='function');
+    const abiNotPayable = abiFunctions.filter(x=>x.payable===false).map(x=>x.name);
+    const abiPayable = abiFunctions.filter(x=>x.payable===true).map(x=>x.name);
+    const abiFuncts = { payble: abiPayable, notpayble: abiNotPayable };
+
+    console.log(abiFuncts);
+
+    const getParams = (name)=>{
+        return iface.abi.filter(x=>x.type==='function' && x.name === name)[0];
+    }
+
+    const setParamInputs = (name)=> {
+        return getParams(name).inputs.map(mi => mi.name || mi.type );
+    }
+
+    const funcName = 'balanceOf';
+    const inputsFunc = ['0x87e76b0a50efc20259cafe0530f75ae0e816aaf2'];
+
+    console.log('name getParams', getParams(funcName));
+    console.log('name setParamInputs', setParamInputs(funcName));
+
+    // console.log('abi', abi2);
     // const abi = TEST_ABI;
 
     const provider = ethers.getDefaultProvider('kovan');
     
     contract = new ethers.Contract(contract_id, abi2, provider);
-    let tx = await contract.name();
+    let tx = await contract[funcName].apply(contract, inputsFunc);
 
-    node.log(tx);
-    console.log('123', tx);
+    const result2 = tx.toString();
+    // String or Object?
+
+    // node.log(tx);
+    console.log('123', result2);
     return;
 
     // Build eth object to sign transaction
