@@ -1,0 +1,127 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ethers-transaction',{
+        category: 'Ethers',
+        color: '#a3b5d2',
+        defaults: { 
+            'name'      : { value: undefined },
+            'network'   : { value: undefined, required: true,  type: 'ethjs-network'},
+            'wallet'    : { value: undefined, required: true, type: 'ethjs-wallet'},
+            'output'    : { value: "payload", required: false },
+            'outputType': { value: "msg" },
+            'wait'      : { value: false },
+            
+            'address'    : { value: "payload",required: false },
+            'addressType': { value: "msg" },
+            'ether'      : { value: "payload",required: false },
+            'etherType'  : { value: "msg" },
+
+            'contract'  : { value: undefined, type: 'ethjs-contract', required: false },
+            'apiCall'   : { value: undefined },
+            'unit'      : { value: undefined },
+            'param1'    : { value: undefined },
+            'param2'    : { value: undefined },
+            'param3'    : { value: undefined },
+        },
+        inputs:  1,
+        outputs: 1,
+        icon: "ethjs.png",
+        align: "left",
+        paletteLabel: "Transaction",
+        label: function() { return this.name || "Ethereum Transaction"; },
+        oneditprepare: function() {
+            if (!this.outputType) this.outputType = 'msg';
+            $("#node-input-output").typedInput({ default: 'msg', types: ['msg'], typeField: $("#node-input-outputType") });
+
+            if (!this.addressType) this.addressType = 'msg';
+            $("#node-input-address").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-addressType") });
+
+            if (!this.etherType) this.etherType = 'msg';
+            $("#node-input-ether").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-etherType") });
+        }
+    })
+</script>
+<style>
+    H4.section     { border-bottom: 1px solid #BBB; margin: 1em 0em 1em 0em; }
+    .input-info    { font-size: 12px; padding-left: 104px; font-style: italic; }
+    .checkbox-info { font-size: 12px; }
+</Style>
+<script type="text/x-red" data-template-name="ethers-transaction">
+
+    <h4 class="section">General</h4>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-network"><i class="icon-tag"></i> Network</label>
+        <input type="text" id="node-input-network" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-wallet"><i class="icon-tag"></i> Wallet</label>
+        <input type="text" id="node-input-wallet" placeholder="">
+        <div class="input-info">This wallet will sign the transaction</div>
+    </div>
+    <div class="form-row">
+        <label for="node-input-output"><i class="icon-tag"></i> Output</label>
+        <input type="text" id="node-input-output" style="width:70%;" placeholder="payload">
+        <input type="hidden" id="node-input-outputType">
+    </div>
+    <div class="form-row">
+        <label for="node-input-wait"><i class="icon-tag"></i> Wait</label>
+        <input type="checkbox" style="width: auto;" id="node-input-wait"> <span class="checkbox-info">(wait a valid transaction)</span>
+    </div>
+    <h4 class="section">Transaction</h4>
+
+    <div class="form-row">
+        <label for="node-input-address"><i class="icon-tag"></i> Address</label>
+        <input type="text" id="node-input-address" style="width:70%;" placeholder="payload">
+        <input type="hidden" id="node-input-addressType">
+        <div class="input-info">Leave empty to use wallet's public address</div>
+    </div>
+    <div class="form-row">
+        <label for="node-input-ether"><i class="icon-tag"></i> Wei</label>
+        <input type="text" id="node-input-ether" style="width:70%;" placeholder="payload">
+        <input type="hidden" id="node-input-etherType">
+        <div class="input-info">Leave empty to get the balance</div>
+    </div>
+
+    <h4 class="section">Contract</h4>
+
+    <div class="form-row">
+        <label for="node-input-contract"><i class="icon-tag"></i> Contract</label>
+        <input type="text" id="node-input-contract" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-apiCall"><i class="icon-tag"></i> API Call</label>
+        <input type="text" id="node-input-apiCall" style="width:260px">
+        <select id="node-input-unit" style="width:auto">
+            <option value=""></option>
+            <option value="wei">Wei</option>
+            <option value="ether">Ether</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="node-input-param1"><i class="icon-tag"></i> Parameter1</label>
+        <input type="text" id="node-input-param1" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-param2"><i class="icon-tag"></i> Parameter2</label>
+        <input type="text" id="node-input-param2" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-param3"><i class="icon-tag"></i> Parameter3</label>
+        <input type="text" id="node-input-param3" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="ethers-transaction">
+    <p>[<i>under development</i>]</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href="https://blog.encausse.net/2018/03/28/le-chatbot-comme-interface-de-la-blockchain/">Encausse.net</a> - blog article</li>
+        <li><a href="https://github.com/ethjs/ethjs">EthJS</a> - documentation</li>
+        <li><a href="https://github.com/NGRP/node-red-contrib-viseo/">VISEO BotMaker</a> - the nodes github repository</li>
+    </ul>
+</script>
