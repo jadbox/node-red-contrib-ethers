@@ -1,6 +1,8 @@
 const helper         = require('node-red-viseo-helper');
 const Eth            = require('ethjs')
-const ethers            = require('ethers')
+const ethers            = require('ethers');
+const etherscan            = require('etherscan-api');
+const fetch = require('node-fetch');
 const SignerProvider = require('ethjs-provider-signer');
 const sign           = require('ethjs-signer').sign;
 const MAX_GAS        = 300000
@@ -31,14 +33,32 @@ module.exports = function(RED) {
 }
 
 const input = async (node, data, config) => {
+    const gVar = node.context().global;
+    const ekey = gVar.get('etherscan_key');
+    const api = etherscan.init(ekey,'kovan', 3000);
+    const contract_id = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa';
+
+    // const network = true?'-kovan':'';
+    // const r = await fetch(`http://api${network}.etherscan.io/api?module=contract&action=getabi&address=${contract_id}&apikey=${ekey}`);
+    // const r2 = await r.json();
+    // console.log('r2', r2);
+
+    const abi = await api.contract
+        .getabi(contract_id);
+
+    const abi2 = abi.result;
+
+    console.log('abi', abi2);
+    // const abi = TEST_ABI;
 
     const provider = ethers.getDefaultProvider('kovan');
-    const abi = TEST_ABI;
-    contract = new ethers.Contract('0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa', abi, provider);
-    let tx = await contract.name;
+    
+    contract = new ethers.Contract(contract_id, abi2, provider);
+    let tx = await contract.name();
 
-    node.log('tx', tx);
-    return {};
+    node.log(tx);
+    console.log('123', tx);
+    return;
 
     // Build eth object to sign transaction
     let eth = getEth(node.network.url, node.wallet.credentials.keyPrivate, node.wallet.keyPublic);
