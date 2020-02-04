@@ -10,7 +10,14 @@
         },
         label: function() {
             return this.name || "Ethereum Contract";
-        }
+        },
+        oneditprepare: function() {
+            console.log('oneditprepare contract');
+        },
+        oneditsave: function() {
+            console.log('oneditsave contract');
+            // node.emit('contract-address', this.address);
+        },
     });
 </script>
 

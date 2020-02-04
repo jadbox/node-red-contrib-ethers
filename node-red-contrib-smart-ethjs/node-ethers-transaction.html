@@ -15,7 +15,7 @@
             'ether'      : { value: "payload",required: false },
             'etherType'  : { value: "msg" },
 
-            'contract'  : { value: undefined, type: 'ethers-contract', required: false },
+            'contract'  : { value: undefined, type: 'ethers-contract', required: true },
             'apiCall'   : { value: undefined },
             'unit'      : { value: undefined },
             'param1'    : { value: undefined },
@@ -37,7 +37,12 @@
 
             if (!this.etherType) this.etherType = 'msg';
             $("#node-input-ether").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-etherType") });
-        }
+        
+            // $("#node-input-ether").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-etherType") });
+        },
+        oneditsave: function() {
+            console.log('oneditsave transaction');
+        },
     })
 </script>
 <style>
@@ -101,7 +106,7 @@
             <option value="ether">Ether</option>
         </select>
     </div>
-    
+
     <div class="form-row node-input-rule-container-row">
         <ol id="node-input-rule-container"></ol>
     </div>
