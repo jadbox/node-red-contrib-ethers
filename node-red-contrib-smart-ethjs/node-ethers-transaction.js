@@ -35,11 +35,16 @@ module.exports = function(RED) {
             node.onContractSave = (e) => {
                 console.log('oneditsave2', e);
             }
-
+            
             const _contract = node.contract = RED.nodes.getNode(config.contract); 
             
             // _contract.addListener("contract-address", node.onContractSave);
             // _contract.addListener("oneditsave", node.onContractSave);
+            _contract.on("input",function() { 
+                console.log('contract input');
+                _contract.removeListener("contract-address", node.onContractSave);
+                
+            });
             _contract.on("change",function() { 
                 console.log('contract change');
                 _contract.removeListener("contract-address", node.onContractSave);
@@ -50,7 +55,7 @@ module.exports = function(RED) {
                 _contract.removeListener("contract-address", node.onContractSave);
             });
 
-            console.log(node.contract);
+            // console.log(node.contract);
         }
 
         if (node.network){

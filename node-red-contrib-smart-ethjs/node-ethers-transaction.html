@@ -29,6 +29,7 @@
         paletteLabel: "Transaction",
         label: function() { return this.name || "Ethereum Transaction"; },
         oneditprepare: function() {
+            console.log('oneditprepare');
             if (!this.outputType) this.outputType = 'msg';
             $("#node-input-output").typedInput({ default: 'msg', types: ['msg'], typeField: $("#node-input-outputType") });
 
@@ -39,6 +40,9 @@
             $("#node-input-ether").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-etherType") });
         
             // $("#node-input-ether").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-etherType") });
+        },
+        oneditcancel: function() {
+            console.log('oneditcancel transaction');
         },
         oneditsave: function() {
             console.log('oneditsave transaction');

@@ -14,7 +14,12 @@ module.exports = function(RED) {
         console.log("ethers-contract init");
 
         this.on('close', function() {
-            console.log('close');
+            console.log('n close');
+
+        });
+
+        this.on('oneditsave', function() {
+            console.log('n oneditsave');
 
         });
     }, {});
