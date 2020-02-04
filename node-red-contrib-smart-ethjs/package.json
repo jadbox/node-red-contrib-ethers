@@ -31,6 +31,7 @@
             "ethjs-contract": "node-ethjs-contract.js",
             "ethjs-transaction": "node-ethjs-transaction.js",
             "ethers-transaction": "node-ethers-transaction.js",
+            "ethers-contract": "node-ethers-contract.js",
             "ethjs-account": "node-ethjs-account.js",
             "ethjs-network": "node-ethjs-network.js"
         }

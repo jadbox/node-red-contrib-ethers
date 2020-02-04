@@ -1,0 +1,44 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ethers-contract',{
+        category: 'config',
+        defaults: {
+            name       : { value: 'Kovan Test Contract' },
+            address    : { value: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa' },
+            // transaction: { value: undefined },
+            abi        : { value: undefined },
+            // bin        : { value: undefined },
+        },
+        label: function() {
+            return this.name || "Ethereum Contract";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="ethers-contract">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-address"><i class="icon-tag"></i> Address</label>
+        <input type="text" id="node-config-input-address" placeholder="">
+    </div>
+    <div class="form-row"><span style="float: right; line-height: 0px;">Optional</span></div>
+    <div class="form-row">
+        <label for="node-config-input-abi"><i class="icon-tag"></i> Abi</label>
+        <textarea id="node-config-input-abi" rows="3" style="width:300px" placeholder="JSON content of the ABI file"></textarea>
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="ethers-contract">
+
+    <p>[<i>under development</i>]</p>
+
+    <h3>References</h3>
+    <ul>
+        <li><a href="https://blog.encausse.net/2018/03/28/le-chatbot-comme-interface-de-la-blockchain/">Encausse.net</a> - blog article</li>
+        <li><a href="https://github.com/ethjs/ethjs">EthJS</a> - documentation</li>
+        <li><a href="https://github.com/NGRP/node-red-contrib-viseo/">VISEO BotMaker</a> - the nodes github repository</li>
+    </ul>
+    
+</script>

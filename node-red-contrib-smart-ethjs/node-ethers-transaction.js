@@ -40,7 +40,7 @@ const input = async (node, data, config) => {
     const gVar = node.context().global;
     const ekey = gVar.get('etherscan_key');
     const api = etherscan.init(ekey,'kovan', 3000);
-    const contract_id = '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa';
+    const contract_id = node.contract.address; // '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa';
 
     // const network = true?'-kovan':'';
     // const r = await fetch(`http://api${network}.etherscan.io/api?module=contract&action=getabi&address=${contract_id}&apikey=${ekey}`);
@@ -90,6 +90,7 @@ const input = async (node, data, config) => {
 
     // node.log(tx);
     console.log('123', result2);
+    console.log('node.contract', node.contract, node.contract.address);
     return;
 
     // Build eth object to sign transaction
