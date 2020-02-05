@@ -16,11 +16,12 @@ TODO: params on msg input object (by order or attr name? both?)
 // --------------------------------------------------------------------------
 
 
-
+let cacheNode = null;
 module.exports = function(RED) {
     const register = function(config) {
         RED.nodes.createNode(this, config);
         let node = this;
+        cacheNode = node;
         node.status({});
 
         if (!config.network)  { node.status({fill:"red", shape:"ring", text: 'Missing network'}); }
@@ -30,42 +31,67 @@ module.exports = function(RED) {
         else                  { node.wallet = RED.nodes.getNode(config.wallet); }
 
         if (!config.contract)  { node.status({fill:"red", shape:"ring", text: 'Missing contract'}); }
-        else { 
-            console.log('node.contract init')
-            node.onContractSave = (e) => {
-                console.log('oneditsave2', e);
-            }
-            
-            const _contract = node.contract = RED.nodes.getNode(config.contract); 
-            
-            // _contract.addListener("contract-address", node.onContractSave);
-            // _contract.addListener("oneditsave", node.onContractSave);
-            _contract.on("input",function() { 
-                console.log('contract input');
-                _contract.removeListener("contract-address", node.onContractSave);
-                
-            });
-            _contract.on("change",function() { 
-                console.log('contract change');
-                _contract.removeListener("contract-address", node.onContractSave);
-                
-            });
-            _contract.on("close",function() { 
-                console.log('contract close');
-                _contract.removeListener("contract-address", node.onContractSave);
-            });
-
-            // console.log(node.contract);
+        else {
+            node.contract = RED.nodes.getNode(config.contract); 
         }
 
-        if (node.network){
+        if (node.network && node.contract){
             this.on('input', (data)  => { input(node, data, config) });
         }
     }
     RED.nodes.registerType("ethers-transaction", register, {});
+
+
+    RED.httpAdmin.post("/abi", RED.auth.needsPermission('ethers-contract.read'), async function(req,res) {
+        // const _contract = node.contract = RED.nodes.getNode(config.contract);
+        const addr = req.body.address;
+        console.log('serialports', addr);
+
+        res.json({ funcs: await getABI(addr) });
+    });
+}
+
+async function getABI(address) {
+    if(!cacheNode) return;
+
+    const gVar = cacheNode.context().global;
+    const ekey = gVar.get('etherscan_key');
+    const api = etherscan.init(ekey,'kovan', 3000);
+    const contract_id = address; // '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa';
+
+    // const network = true?'-kovan':'';
+    // const r = await fetch(`http://api${network}.etherscan.io/api?module=contract&action=getabi&address=${contract_id}&apikey=${ekey}`);
+    // const r2 = await r.json();
+    // console.log('r2', r2);
+
+    const abi = await api.contract
+        .getabi(contract_id);
+
+    const abi2 = abi.result;
+
+    // const r2 = ethers.utils.defaultAbiCoder;
+    var iface = new ethers.utils.Interface(abi2)
+
+    // console.log('iface', iface.functions);
+    const abiFunctions = iface.abi.filter(x=>x.type==='function');
+    const abiNotPayable = abiFunctions.filter(x=>x.payable===false).map(x=>x.name);
+    const abiPayable = abiFunctions.filter(x=>x.payable===true).map(x=>x.name);
+    const abiFuncts = { payble: abiPayable, notpayble: abiNotPayable };
+
+    const getParams = (name)=>{
+        return iface.abi.filter(x=>x.type==='function' && x.name === name)[0];
+    }
+
+    const setParamInputs = (name)=> {
+        return getParams(name).inputs.map(mi => mi.name || mi.type );
+    }
+
+    return abiFunctions;
 }
 
 const input = async (node, data, config) => {
+    console.log(node,'---\n', data, '----\n', config);
+    return;
     const gVar = node.context().global;
     const ekey = gVar.get('etherscan_key');
     const api = etherscan.init(ekey,'kovan', 3000);
@@ -100,7 +126,7 @@ const input = async (node, data, config) => {
         return getParams(name).inputs.map(mi => mi.name || mi.type );
     }
 
-    const funcName = 'balanceOf';
+    const funcName = node.apiCall // 'balanceOf';
     const inputsFunc = ['0x87e76b0a50efc20259cafe0530f75ae0e816aaf2'];
 
     console.log('name getParams', getParams(funcName));
@@ -118,8 +144,8 @@ const input = async (node, data, config) => {
     // String or Object?
 
     // node.log(tx);
-    console.log('123', result2);
-    console.log('node.contract', node.contract.address);
+    console.log('result2', result2);
+    // console.log('node.contract', node.contract.address);
     return;
 
     // Build eth object to sign transaction

@@ -8,6 +8,7 @@
             abi        : { value: undefined },
             // bin        : { value: undefined },
         },
+        hasValue: true,
         label: function() {
             return this.name || "Ethereum Contract";
         },
@@ -16,7 +17,7 @@
         },
         oneditsave: function() {
             console.log('oneditsave contract');
-            node.emit('oneditsave', this.address);
+            // this.emit('oneditsave', this.address);
         },
     });
 </script>
