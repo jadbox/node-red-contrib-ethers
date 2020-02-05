@@ -18,7 +18,7 @@
       contract: { value: undefined, type: 'ethers-contract', required: true },
       apiCall: { value: undefined },
       unit: { value: undefined },
-      param1: { value: undefined },
+      param1: { value: [] },
       param2: { value: undefined },
       param3: { value: undefined }
     },
@@ -55,19 +55,21 @@
       $('#node-input-apiCall').on('change', (type, value) => {
         if (!abiData) return;
         const t = type.target.selectedOptions[0].value;
-        const p = abiData.filter(x => x.name === t)[0].inputs.map(mi => mi.name || mi.type);
+        const p = abiData.filter(x => x.name === t)[0]
+            .inputs.map( (mi, i) => Object.assign({label: mi.name || mi.type, i: i}, mi) );
         console.log('tp', t, p);
 
-        const a = p.map((x, i) => {
+        const a = p.map((x) => {
+            const l = x.label;
           return `<div class="form-row">
-                        <label for="node-input-param-${x}"><i class="icon-tag"></i> ${x}</label>
-                        <input type="text" id="node-input-param-${x}" placeholder="">
+                        <label for="node-input-param-${x.i}"><i class="icon-tag"></i>${x.i+1}. ${l}</label>
+                        <input type="text" id="node-input-param-${x.i}" placeholder="">
                     </div>`;
         });
         $('#contract-params').html(a.join(''));
 
         p.forEach((x, i) => {
-            $(`#node-input-param-${x}`).typedInput({
+            $(`#node-input-param-${x.i}`).typedInput({
                 default: 'str',
                 'value': '',
                 types: ['msg', 'str']
@@ -109,16 +111,17 @@
       const ns = $('#contract-params [id^="node-input-param-"]');
       if(ns.length===0) console.log('no params found');
 
-      const params = {};
+      const params = new Array(ns.length);
       ns.each(function(x) {
           const n = $(this)[0];
-          const field = n.id.replace('node-input-param-', '');
+          const fieldIndex = parseInt( n.id.replace('node-input-param-', '') );
           const val = n.value;
-          params[field] = val;
-        console.log('field', field, val);
+          params[fieldIndex] = val;
+        console.log('field', fieldIndex, val);
       });
 
       this.param1 = params;
+      console.log('this.param1', this.param1);
     }
   });
 </script>

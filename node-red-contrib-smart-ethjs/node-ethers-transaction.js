@@ -90,8 +90,14 @@ async function getABI(address) {
 }
 
 const input = async (node, data, config) => {
-    console.log(node,'---\n', data, '----\n', config);
-    return;
+    // console.log(node,'---\n', data, '----\n')
+    console.log(config);
+    const params = config.param1;
+
+    console.log('params', params);
+
+    // return;
+
     const gVar = node.context().global;
     const ekey = gVar.get('etherscan_key');
     const api = etherscan.init(ekey,'kovan', 3000);
@@ -126,11 +132,11 @@ const input = async (node, data, config) => {
         return getParams(name).inputs.map(mi => mi.name || mi.type );
     }
 
-    const funcName = node.apiCall // 'balanceOf';
-    const inputsFunc = ['0x87e76b0a50efc20259cafe0530f75ae0e816aaf2'];
+    const funcName = config.apiCall; // 'balanceOf';
+    const inputsFunc = params; // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
 
-    console.log('name getParams', getParams(funcName));
-    console.log('name setParamInputs', setParamInputs(funcName));
+    console.log('name getParams', funcName, inputsFunc);
+    // console.log('name setParamInputs', setParamInputs(funcName));
 
     // console.log('abi', abi2);
     // const abi = TEST_ABI;
