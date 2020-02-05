@@ -106,6 +106,19 @@
     },
     oneditsave: function() {
       console.log('oneditsave transaction');
+      const ns = $('#contract-params [id^="node-input-param-"]');
+      if(ns.length===0) console.log('no params found');
+
+      const params = {};
+      ns.each(function(x) {
+          const n = $(this)[0];
+          const field = n.id.replace('node-input-param-', '');
+          const val = n.value;
+          params[field] = val;
+        console.log('field', field, val);
+      });
+
+      this.param1 = params;
     }
   });
 </script>
