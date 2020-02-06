@@ -53,21 +53,26 @@
       // TODO test
       let abiData = null;
       $('#node-input-apiCall').on('change', (type, value) => {
-        if (!abiData) return;
+        if (!abiData) {
+            console.error('no abiData on change');
+            return;
+        }
         const t = type.target.selectedOptions[0].value;
         const p = abiData.filter(x => x.name === t)[0]
             .inputs.map( (mi, i) => Object.assign({label: mi.name || mi.type, i: i}, mi) );
+        
         console.log('tp', t, p);
 
-        const a = p.map((x) => {
+        const paramNodes = p.map((x) => {
             const l = x.label;
           return `<div class="form-row">
                         <label for="node-input-param-${x.i}"><i class="icon-tag"></i>${x.i+1}. ${l}</label>
                         <input type="text" id="node-input-param-${x.i}" placeholder="">
                     </div>`;
         });
-        $('#contract-params').html(a.join(''));
+        $('#contract-params').html(paramNodes.join(''));
 
+        // typedInput each param
         p.forEach((x, i) => {
             $(`#node-input-param-${x.i}`).typedInput({
                 default: 'str',
@@ -77,28 +82,46 @@
         });
       });
 
-      $('#node-input-contract').on('change', (type, value) => {
-        // WORKS!
-        // const v = $("#node-input-contract").typedInput('value');
-        const t = type.target.selectedOptions[0].value;
-        console.log('type', type, t);
-        // console.log('t', t, t.selectedOptions[0].value);
-        const address = RED.nodes.node(t).address;
-        console.log('change node', address);
+      const decorateFuncNames = (funcs) => {
+        console.log('decorateInputs', funcs);
 
-        $.post('abi', { address: address }, function(data) {
-          console.log('serialports test', data);
-          $('#node-input-apiCall').empty();
-          /// $('#node-input-apiCall').typedInput({default: '', types:data.funcs.map(x=>x.name)});
-          const t = data.funcs.map(x => x.name);
-          abiData = data.funcs;
-          t.forEach(x =>
+        // Todo keep option around DEFAUzLT Select
+        funcs.forEach(x => {
+            x = x.name;
+            // console.log('x', x);
             $('#node-input-apiCall').append(
               $('<option></option>')
                 .val(x)
                 .html(x)
             )
-          );
+        });
+      }
+
+      let abiDataAddress = null;
+      $('#node-input-contract').on('change', (type, value) => {
+        // WORKS!
+        // const v = $("#node-input-contract").typedInput('value');
+        const t = type.target.selectedOptions[0].value;
+        // console.log('type', type, t);
+        // console.log('t', t, t.selectedOptions[0].value);
+        const address = RED.nodes.node(t).address;
+        // console.log('change node', address);
+
+        if( (abiDataAddress===address || !abiDataAddress) && abiData) {
+            // console.log('reusing data');
+            decorateFuncNames(abiData);
+        }
+        else $.post('abi', { address: address }, function(data) {
+            
+            // abiDataAddress 
+          abiDataAddress = address;
+          // console.log('serialports test', data);
+          $('#node-input-apiCall').empty();
+          /// $('#node-input-apiCall').typedInput({default: '', types:data.funcs.map(x=>x.name)});
+          const t = data.funcs.map(x => x.name);
+          abiData = data.funcs;
+          // console.log('got data', abiData);
+          decorateFuncNames(abiData);
         });
       });
       // $("#node-input-ether").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-etherType") });
