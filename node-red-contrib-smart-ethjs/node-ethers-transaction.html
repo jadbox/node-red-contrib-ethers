@@ -1,4 +1,8 @@
 <script type="text/javascript">
+  // Caches
+  let abiData = null;
+  let abiDataAddress = null;
+
   RED.nodes.registerType('ethers-transaction', {
     category: 'Ethers',
     color: '#a3b5d2',
@@ -18,9 +22,14 @@
       contract: { value: undefined, type: 'ethers-contract', required: true },
       apiCall: { value: undefined },
       unit: { value: undefined },
-      param1: { value: [] },
+      params: { value: undefined },
+      param0: { value: undefined },
+      param1: { value: undefined },
       param2: { value: undefined },
-      param3: { value: undefined }
+      param3: { value: undefined },
+      param4: { value: undefined },
+      param5: { value: undefined },
+      param6: { value: undefined }
     },
     inputs: 1,
     outputs: 1,
@@ -32,6 +41,7 @@
       return this.name || 'Ethereum Transaction';
     },
     oneditprepare: function() {
+      const node = this;
       console.log('oneditprepare');
       if (!this.outputType) this.outputType = 'msg';
       $('#node-input-output').typedInput({ default: 'msg', types: ['msg'], typeField: $('#node-input-outputType') });
@@ -51,53 +61,75 @@
       });
 
       // TODO test
-      let abiData = null;
-      $('#node-input-apiCall').on('change', (type, value) => {
+      const onABI = (type, value) => {
         if (!abiData) {
-            console.error('no abiData on change');
-            return;
+          console.error('no abiData on change');
+          return;
         }
-        const t = type.target.selectedOptions[0].value;
-        const p = abiData.filter(x => x.name === t)[0]
-            .inputs.map( (mi, i) => Object.assign({label: mi.name || mi.type, i: i}, mi) );
-        
-        console.log('tp', t, p);
+        const selectedFunc = type ? type.target.selectedOptions[0].value : node.apiCall;
 
+        const p = abiData
+          .filter(x => x.name === selectedFunc)[0]
+          .inputs.map((mi, i) => Object.assign({ label: mi.name || mi.type, i: i }, mi));
+
+        console.log('tp', selectedFunc, p);
+
+        // Make question nodes
         const paramNodes = p.map((x) => {
             const l = x.label;
           return `<div class="form-row">
-                        <label for="node-input-param-${x.i}"><i class="icon-tag"></i>${x.i+1}. ${l}</label>
-                        <input type="text" id="node-input-param-${x.i}" placeholder="">
+                        <label for="node-input-param${x.i}"><i class="icon-tag"></i>${x.i+1}. ${l}</label>
+                        <input type="text" id="node-input-param${x.i}" placeholder="">
                     </div>`;
         });
         $('#contract-params').html(paramNodes.join(''));
+        
 
         // typedInput each param
         p.forEach((x, i) => {
-            $(`#node-input-param-${x.i}`).typedInput({
-                default: 'str',
-                'value': '',
-                types: ['msg', 'str']
-            });
+          const paramString = `node-input-param${x.i}`;
+          $(`label[for='${paramString}']`).html(i + 1 + '. ' + x.label);
+
+          const pNode = $('#' + paramString);
+
+          const paramValue = node[`param${i}`];
+          console.log('paramValue', paramValue);
+          pNode.val(paramValue);
+
+          pNode.typedInput({
+            default: 'str',
+            value: paramValue, // this[`node-input-param${x.i}`]
+            types: ['msg', 'str']
+          });
         });
+      };
+
+      $('#node-input-apiCall').on('change', (type, value) => {
+        onABI(type, value);
       });
 
-      const decorateFuncNames = (funcs) => {
-        console.log('decorateInputs', funcs);
+      const decorateFuncNames = funcs => {
+        console.log('decorateInputs2', funcs);
+        // return;
 
+        $('#node-input-apiCall').empty();
         // Todo keep option around DEFAUzLT Select
-        funcs.forEach(x => {
-            x = x.name;
-            // console.log('x', x);
-            $('#node-input-apiCall').append(
-              $('<option></option>')
-                .val(x)
-                .html(x)
-            )
+        // console.log('decorateInputs', node.apiCall);
+        funcs.forEach((x, i) => {
+          x = x.name;
+          // const _node = $('#node-input-apiCall option');
+          // $('#node-input-apiCall option').eq(i).text(x) // .value(x)
+          //  .prop('selected', x===node.apiCall);
+          // console.log('x', x);
+          $('#node-input-apiCall').append(
+            $('<option></option>')
+              .val(x)
+              .text(x)
+              .prop('selected', x === node.apiCall)
+          );
         });
-      }
+      };
 
-      let abiDataAddress = null;
       $('#node-input-contract').on('change', (type, value) => {
         // WORKS!
         // const v = $("#node-input-contract").typedInput('value');
@@ -107,22 +139,24 @@
         const address = RED.nodes.node(t).address;
         // console.log('change node', address);
 
-        if( (abiDataAddress===address || !abiDataAddress) && abiData) {
-            // console.log('reusing data');
-            decorateFuncNames(abiData);
-        }
-        else $.post('abi', { address: address }, function(data) {
-            
-            // abiDataAddress 
-          abiDataAddress = address;
-          // console.log('serialports test', data);
-          $('#node-input-apiCall').empty();
-          /// $('#node-input-apiCall').typedInput({default: '', types:data.funcs.map(x=>x.name)});
-          const t = data.funcs.map(x => x.name);
-          abiData = data.funcs;
-          // console.log('got data', abiData);
+        if ((abiDataAddress === address || !abiDataAddress) && abiData) {
+          // console.log('reusing data');
           decorateFuncNames(abiData);
-        });
+        } else
+          $.post('abi', { address: address }, function(data) {
+            // abiDataAddress
+            abiDataAddress = address;
+            // console.log('serialports test', data);
+
+            /// $('#node-input-apiCall').typedInput({default: '', types:data.funcs.map(x=>x.name)});
+            const t = data.funcs.map(x => x.name);
+            abiData = data.funcs;
+            // console.log('got data', abiData);
+            decorateFuncNames(abiData);
+
+            // Populate params
+            onABI();
+          });
       });
       // $("#node-input-ether").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-etherType") });
     },
@@ -131,20 +165,20 @@
     },
     oneditsave: function() {
       console.log('oneditsave transaction');
-      const ns = $('#contract-params [id^="node-input-param-"]');
-      if(ns.length===0) console.log('no params found');
+      const ns = $('#contract-params [id^="node-input-param"]');
+      if (ns.length === 0) console.log('no params found');
 
       const params = new Array(ns.length);
       ns.each(function(x) {
-          const n = $(this)[0];
-          const fieldIndex = parseInt( n.id.replace('node-input-param-', '') );
-          const val = n.value;
-          params[fieldIndex] = val;
+        const n = $(this)[0];
+        const fieldIndex = parseInt(n.id.replace('node-input-param', ''));
+        const val = n.value;
+        params[fieldIndex] = val;
         console.log('field', fieldIndex, val);
       });
 
-      this.param1 = params;
-      console.log('this.param1', this.param1);
+      this.params = params;
+      console.log('this.params', this.params);
     }
   });
 </script>
@@ -212,8 +246,11 @@
   </div>
   <div class="form-row">
       <label for="node-input-apiCall"><i class="icon-tag"></i> API Call</label>
-      <select id="node-input-apiCall" style="width:260px" onchange="this.nextElementSibling.value=this.value">
-          <option value=""></option>
+      <select id="node-input-apiCall" style="width:260px">
+          <option /><option /><option /><option /><option /><option /><option /><option /><option />
+          <option /><option /><option /><option /><option /><option /><option /><option /><option />
+          <option /><option /><option /><option /><option /><option /><option /><option /><option />
+          <option /><option /><option /><option /><option /><option /><option /><option /><option />
       </select>
 
       <select id="node-input-unit" style="width:auto">
@@ -226,9 +263,35 @@
   <div class="form-row node-input-rule-container-row">
       <ol id="node-input-rule-container"></ol>
   </div>
-
   <div id="contract-params">
-
+    <div class="form-row">
+      <label for="node-input-param0"><i class="icon-tag"></i>1.</label>
+      <input type="text" id="node-input-param0" placeholder="">
+    </div>
+    <div class="form-row">
+      <label for="node-input-param1"><i class="icon-tag"></i>2.</label>
+      <input type="text" id="node-input-param1" placeholder="">
+    </div>
+    <div class="form-row">
+      <label for="node-input-param2"><i class="icon-tag"></i>3.</label>
+      <input type="text" id="node-input-param2" placeholder="">
+    </div>
+    <div class="form-row">
+      <label for="node-input-param3"><i class="icon-tag"></i>4.</label>
+      <input type="text" id="node-input-param3" placeholder="">
+    </div>
+    <div class="form-row">
+      <label for="node-input-param4"><i class="icon-tag"></i>5.</label>
+      <input type="text" id="node-input-param4" placeholder="">
+    </div>
+    <div class="form-row">
+      <label for="node-input-param5"><i class="icon-tag"></i>6.</label>
+      <input type="text" id="node-input-param5" placeholder="">
+    </div>
+    <div class="form-row">
+      <label for="node-input-param6"><i class="icon-tag"></i>7.</label>
+      <input type="text" id="node-input-param6" placeholder="">
+    </div>
   </div>
 </script>
 
@@ -237,8 +300,6 @@
 
   <h3>References</h3>
   <ul>
-      <li><a href="https://blog.encausse.net/2018/03/28/le-chatbot-comme-interface-de-la-blockchain/">Encausse.net</a> - blog article</li>
-      <li><a href="https://github.com/ethjs/ethjs">EthJS</a> - documentation</li>
-      <li><a href="https://github.com/NGRP/node-red-contrib-viseo/">VISEO BotMaker</a> - the nodes github repository</li>
+      <li><a href="https://docs.ethers.io/ethers.js/html/">Ethers.js</a> - documentation</li>
   </ul>
 </script>
