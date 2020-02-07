@@ -24,12 +24,19 @@
       unit: { value: undefined },
       params: { value: undefined },
       param0: { value: undefined },
+      typeParam0: { value: undefined },
       param1: { value: undefined },
+      typeParam1: { value: undefined },
       param2: { value: undefined },
+      typeParam2: { value: undefined },
       param3: { value: undefined },
+      typeParam3: { value: undefined },
       param4: { value: undefined },
+      typeParam4: { value: undefined },
       param5: { value: undefined },
-      param6: { value: undefined }
+      typeParam5: { value: undefined },
+      param6: { value: undefined },
+      typeParam6: { value: undefined },
     },
     inputs: 1,
     outputs: 1,
@@ -80,6 +87,7 @@
           return `<div class="form-row">
                         <label for="node-input-param${x.i}"><i class="icon-tag"></i>${x.i+1}. ${l}</label>
                         <input type="text" id="node-input-param${x.i}" placeholder="">
+                        <input type="hidden" id="node-input-typeParam${x.i}">
                     </div>`;
         });
         $('#contract-params').html(paramNodes.join(''));
@@ -97,9 +105,10 @@
           pNode.val(paramValue);
 
           pNode.typedInput({
-            default: 'str',
-            value: paramValue, // this[`node-input-param${x.i}`]
-            types: ['msg', 'str']
+            default: node[`typeParam${x.i}`] || 'str',
+            value: node[`typeParam${x.i}`] || 'str', // this[`node-input-param${x.i}`]
+            types: ['msg', 'str'],
+            typeField: $(`#node-input-typeParam${x.i}`)
           });
         });
       };
@@ -113,7 +122,7 @@
         // return;
 
         $('#node-input-apiCall').empty();
-        // Todo keep option around DEFAUzLT Select
+        // Todo keep option around DEFAULT Select
         // console.log('decorateInputs', node.apiCall);
         funcs.forEach((x, i) => {
           x = x.name;
@@ -265,32 +274,39 @@
   </div>
   <div id="contract-params">
     <div class="form-row">
-      <label for="node-input-param0"><i class="icon-tag"></i>1.</label>
+      <label for="node-input-param0"><i class="icon-tag"></i>0.</label>
       <input type="text" id="node-input-param0" placeholder="">
+      <input type="hidden" id="node-input-typeParam0">
     </div>
     <div class="form-row">
-      <label for="node-input-param1"><i class="icon-tag"></i>2.</label>
+      <label for="node-input-param1"><i class="icon-tag"></i>1.</label>
       <input type="text" id="node-input-param1" placeholder="">
+      <input type="hidden" id="node-input-typeParam1">
     </div>
     <div class="form-row">
-      <label for="node-input-param2"><i class="icon-tag"></i>3.</label>
+      <label for="node-input-param2"><i class="icon-tag"></i>2.</label>
       <input type="text" id="node-input-param2" placeholder="">
+      <input type="hidden" id="node-input-typeParam2">
     </div>
     <div class="form-row">
-      <label for="node-input-param3"><i class="icon-tag"></i>4.</label>
+      <label for="node-input-param3"><i class="icon-tag"></i>3.</label>
       <input type="text" id="node-input-param3" placeholder="">
+      <input type="hidden" id="node-input-typeParam3">
     </div>
     <div class="form-row">
-      <label for="node-input-param4"><i class="icon-tag"></i>5.</label>
+      <label for="node-input-param4"><i class="icon-tag"></i>4.</label>
       <input type="text" id="node-input-param4" placeholder="">
+      <input type="hidden" id="node-input-typeParam4">
     </div>
     <div class="form-row">
-      <label for="node-input-param5"><i class="icon-tag"></i>6.</label>
+      <label for="node-input-param5"><i class="icon-tag"></i>5.</label>
       <input type="text" id="node-input-param5" placeholder="">
+      <input type="hidden" id="node-input-typeParam5">
     </div>
     <div class="form-row">
-      <label for="node-input-param6"><i class="icon-tag"></i>7.</label>
+      <label for="node-input-param6"><i class="icon-tag"></i>6.</label>
       <input type="text" id="node-input-param6" placeholder="">
+      <input type="hidden" id="node-input-typeParam6">
     </div>
   </div>
 </script>
