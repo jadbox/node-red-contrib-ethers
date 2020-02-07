@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    RED.nodes.registerType('ethjs-wallet',{
+    RED.nodes.registerType('ethers-wallet',{
         category: 'config',
         defaults: {
             name:       { value: undefined },
@@ -14,7 +14,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="ethjs-wallet">
+<script type="text/x-red" data-template-name="ethers-wallet">
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-config-input-name" placeholder="">
@@ -29,15 +29,6 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="ethjs-wallet">
-
-    <p>[<i>under development</i>]</p>
-
-    <h3>References</h3>
-    <ul>
-        <li><a href="https://blog.encausse.net/2018/03/28/le-chatbot-comme-interface-de-la-blockchain/">Encausse.net</a> - blog article</li>
-        <li><a href="https://github.com/ethjs/ethjs">EthJS</a> - documentation</li>
-        <li><a href="https://github.com/NGRP/node-red-contrib-viseo/">VISEO BotMaker</a> - the nodes github repository</li>
-    </ul>
+<script type="text/x-red" data-help-name="ethers-wallet">
     
 </script>

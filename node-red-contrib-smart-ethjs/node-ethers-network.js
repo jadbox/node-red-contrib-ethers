@@ -1,7 +1,7 @@
 module.exports = function(RED) {
 
     // CREDENTIALS
-    RED.nodes.registerType("ethjs-network", function(config){
+    RED.nodes.registerType("ethers-network", function(config){
         RED.nodes.createNode(this, config);
         this.name        = config.name;
         this.url         = config.url;

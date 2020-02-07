@@ -27,13 +27,10 @@
     ],
     "node-red": {
         "nodes": {
-            "ethjs-wallet": "node-ethjs-wallet.js",
-            "ethjs-contract": "node-ethjs-contract.js",
-            "ethjs-transaction": "node-ethjs-transaction.js",
+            "ethers-wallet": "node-ethers-wallet.js",
             "ethers-contract": "node-ethers-contract.js",
             "ethers-transaction": "node-ethers-transaction.js",
-            "ethjs-account": "node-ethjs-account.js",
-            "ethjs-network": "node-ethjs-network.js"
+            "ethers-network": "node-ethers-network.js"
         }
     }
 }
