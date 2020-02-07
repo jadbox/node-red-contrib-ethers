@@ -1,10 +1,10 @@
 {
-    "name": "ethabi",
-    "description": "Node-Red - smarter eth nodes",
+    "name": "node-red-contrib-ethers-flow",
+    "description": "Simply call etherium contracts, powered by Ethers.js and Etherscan",
     "version": "0.0.1",
     "dependencies": {
         "ethers": "^4.0.44",
-        "node-red-contrib-smart-ethjs": "file:./node-red-contrib-smart-ethjs"
+        "node-red-contrib-ethers": "file:./node-red-contrib-ethers"
     },
     "node-red": {
         "settings": {

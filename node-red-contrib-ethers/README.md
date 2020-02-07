@@ -1,6 +1,6 @@
 # Node-RED
 
-Ethers.js account and transaction nodes.
+Ethers.js contract execution node that uses etherscan to automatically fetch the contract method list and method parameters.
 
 ## Quick Start
 

@@ -1,7 +1,21 @@
-ethabi
-======
+# Node-RED
 
-### About
+Ethers.js contract execution node that uses etherscan to automatically fetch the contract method list and method parameters.
 
-This is your project's README.md file. It helps users understand what your
-project does, how to use it and anything else they may need to know.
+## Quick Start
+
+```
+npm install XXXX
+```
+
+## Getting Help
+
+A documentation is available on [this Wiki](#)
+
+## Contributing
+
+## Authors
+
+This project is a creation of [Abridged](http://www.Abridged.io)
+
+- Jonathan Dunlap [@jadbox](https://twitter.com/jadbox)
