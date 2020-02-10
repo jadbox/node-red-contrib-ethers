@@ -694,8 +694,8 @@ node-fetch@^2.6.0:
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.0.tgz#e633456386d4aa55863f676a7ab0daa8fdecb0fd"
   integrity sha512-8dG4H5ujfvFiqDmVu9fQ5bOHUC15JMjMY/Zumv26oOvvVJjM67KF8koCWIabKQ1GJIa9r2mMZscBq/TbdOcmNA==
 
-"node-red-contrib-smart-ethjs@file:./node-red-contrib-smart-ethjs":
-  version "0.0.1"
+"node-red-contrib-ethers@file:./node-red-contrib-ethers":
+  version "0.8.0"
   dependencies:
     ethers "^4.0.44"
     etherscan-api "^10.0.5"

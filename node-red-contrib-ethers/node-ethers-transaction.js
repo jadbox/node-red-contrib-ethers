@@ -1,15 +1,7 @@
-const helper = require('node-red-viseo-helper');
-const Eth = require('ethjs')
 const ethers = require('ethers');
 const etherscan = require('etherscan-api');
-// const fetch = require('node-fetch');
-const SignerProvider = require('ethjs-provider-signer');
-const sign = require('ethjs-signer').sign;
-const MAX_GAS = 300000;
 
-/*
-TODO: params on msg input object (by order or attr name? both?)
-*/
+// const MAX_GAS = 300000;
 
 // --------------------------------------------------------------------------
 //  NODE-RED
