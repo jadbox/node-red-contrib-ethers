@@ -37,7 +37,6 @@ module.exports = function (RED) {
     RED.httpAdmin.post("/abi", RED.auth.needsPermission('ethers-contract.read'), async function (req, res) {
         // const _contract = node.contract = RED.nodes.getNode(config.contract);
         const addr = req.body.address;
-        console.log('serialports', addr);
 
         res.json({ funcs: await getABIFuncs(addr) });
     });
@@ -76,7 +75,7 @@ const getABI = async (node, contract) => {
 
 const input = async (RED, node, data, config) => {
     // console.log(node,'---\n', data, '----\n')
-    const payload = data.payload || {};
+    // const payload = data.payload || {};
     // let payloadConf = payload.config || {};
     // let payloadParams = payloadConf.params || [];
 
@@ -101,8 +100,6 @@ const input = async (RED, node, data, config) => {
         return;
     } */
 
-    node.log(`call ${contractAddr} with: ${params}`);
-
     const abi = await getABI(node, contractAddr);
 
     const funcName = config.apiCall; // 'balanceOf';
@@ -114,14 +111,45 @@ const input = async (RED, node, data, config) => {
     const provider = ethers.getDefaultProvider('kovan');
 
     contract = new ethers.Contract(contractAddr, abi, provider);
-    let tx = await contract[funcName].apply(contract, params); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
+
+    
+    let contractWithMaybeSigner = contract;
+    if(node.wallet.keyPrivate) {
+        console.log('signing');
+        const wallet = new Wallet(node.wallet.keyPrivate, provider) 
+        contractWithMaybeSigner = contract.connect(wallet);
+    }
+
+    const paramsWithOverrides = params.concat([{
+            // The address to execute the call as
+        from: getPropByType(RED, config, data, 'address') || undefined, // "0x0123456789012345678901234567890123456789",
+
+        // The maximum units of gas for the transaction to use
+        // gasPrice: node.gasPrice || undefined,
+        gasLimit: getPropByType(RED, config, data, 'gaslimit') || undefined,
+        // value: node.ether || undefined,
+        value: getPropByType(RED, config, data, 'ether') || undefined,
+    }]);
+
+    node.log(`call ${contractAddr} with: ${JSON.stringify(paramsWithOverrides)}`);
+
+    let tx = await contractWithMaybeSigner[funcName].apply(contractWithMaybeSigner, paramsWithOverrides); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
 
     const result = tx.toString();
     // String or Object?
 
     // node.log(tx);
-    node.log(`result ${contractAddr}: ${result}`);
+    node.log(`result ${contractAddr}: "${result}"`);
 
     node.send({ payload: result });
     return;
+}
+
+const getPropByType = (RED, node, data, prop) => {
+    // node[prop] && 
+    const x = node[prop];
+    let r = (x && x.indexOf('payload') === 0 ) ? RED.util.getMessageProperty(data, x) : x;
+    if(r === "") r = undefined;
+    console.log('looking prop', prop, 'x', x, 'r:', r);
+    return r;
 }
