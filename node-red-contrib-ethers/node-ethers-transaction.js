@@ -120,6 +120,9 @@ const input = async (RED, node, data, config) => {
         contractWithMaybeSigner = contract.connect(wallet);
     }
 
+    const paymentString = getPropByType(RED, config, data, 'ether');
+    const payment = paymentString ? ethers.utils.parseEther(paymentString) : undefined;
+
     const paramsWithOverrides = params.concat([{
             // The address to execute the call as
         from: getPropByType(RED, config, data, 'address') || undefined, // "0x0123456789012345678901234567890123456789",
@@ -128,12 +131,12 @@ const input = async (RED, node, data, config) => {
         // gasPrice: node.gasPrice || undefined,
         gasLimit: getPropByType(RED, config, data, 'gaslimit') || undefined,
         // value: node.ether || undefined,
-        value: getPropByType(RED, config, data, 'ether') || undefined,
+        // value: payment,
     }]);
 
     node.log(`call ${contractAddr} with: ${JSON.stringify(paramsWithOverrides)}`);
 
-    let tx = await contractWithMaybeSigner[funcName].apply(contractWithMaybeSigner, paramsWithOverrides); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
+    let tx = await contractWithMaybeSigner[funcName](...paramsWithOverrides); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
 
     const result = tx.toString();
     // String or Object?
@@ -141,15 +144,19 @@ const input = async (RED, node, data, config) => {
     // node.log(tx);
     node.log(`result ${contractAddr}: "${result}"`);
 
-    node.send({ payload: result });
+    let msg = {  };
+    RED.util.setMessageProperty(msg, config.output || 'payload', result, true);
+    // console.log('-', msg, config.output, result);
+    // console.log('msgOutput');
+    node.send(msg);
     return;
 }
 
-const getPropByType = (RED, node, data, prop) => {
+const getPropByType = (RED, obj, data, prop) => {
     // node[prop] && 
-    const x = node[prop];
-    let r = (x && x.indexOf('payload') === 0 ) ? RED.util.getMessageProperty(data, x) : x;
-    if(r === "") r = undefined;
-    console.log('looking prop', prop, 'x', x, 'r:', r);
+    const x = obj[prop];
+    let r = (x!==undefined && x.indexOf('payload') === 0 ) ? RED.util.getMessageProperty(data, x) : x;
+    if(r === "" || r === null) r = undefined;
+    // if(x) console.log('looking prop', prop, 'x:', x, 'r:', r);
     return r;
 }
