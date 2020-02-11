@@ -131,7 +131,7 @@ const input = async (RED, node, data, config) => {
         // gasPrice: node.gasPrice || undefined,
         gasLimit: getPropByType(RED, config, data, 'gaslimit') || undefined,
         // value: node.ether || undefined,
-        // value: payment,
+        value: payment
     }]);
 
     node.log(`call ${contractAddr} with: ${JSON.stringify(paramsWithOverrides)}`);
