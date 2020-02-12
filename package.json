@@ -1,7 +1,9 @@
 {
     "name": "node-red-contrib-ethers-flow",
+    "private": true,
     "description": "Simply call etherium contracts, powered by Ethers.js and Etherscan",
-    "version": "0.0.1",
+    "version": "1.0.0",
+    "author": "Jonathan Dunlap <jdunlap@outlook.com> (https://https://twitter.com/jadbox)",
     "dependencies": {
         "ethers": "^4.0.44",
         "node-red-contrib-ethers": "file:./node-red-contrib-ethers"

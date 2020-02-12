@@ -1,4 +1,4 @@
-# Node-RED
+# Node-RED Etherium Transaction Node
 
 This provides a Ethers contract transaction node that uses Ethers.js and Etherscan to automatically fetch the contract method list and method parameters.
 
