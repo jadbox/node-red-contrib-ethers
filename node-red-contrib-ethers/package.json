@@ -4,20 +4,18 @@
     "description": "Simply call etherium contracts, powered by Ethers.js and Etherscan",
     "dependencies": {
         "ethers": "^4.0.44",
-        "etherscan-api": "^10.0.5",
-        "ethjs-account": "~0.1.4",
-        "ethjs-signer": "~0.1.1"
+        "etherscan-api": "^10.0.5"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/jadbox/node-red-contrib-smart-ethjs"
+        "url": "https://github.com/jadbox/node-red-contrib-ethers"
     },
     "license": "Apache-2.0",
     "keywords": [
         "node-red",
         "blockchain",
-        "ethjs",
-        "azure",
+        "ethers",
+        "ethersjs",
         "smart",
         "contracts"
     ],
