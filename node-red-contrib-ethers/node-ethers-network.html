@@ -3,8 +3,11 @@
         category: 'config',
         defaults: {
             name       : { value: undefined },
-            url        : { value: undefined },
+            url        : { value: undefined, required: true },
             description: { value: undefined },
+        },
+        credentials: {
+            etherScanKeyPrivate: { value: undefined, required: false },
         },
         label: function() {
             return this.name || "Ethereum Network";
@@ -21,12 +24,21 @@
         <label for="node-config-input-url"><i class="icon-tag"></i> URL</label>
         <input type="text" id="node-config-input-url" placeholder="http://url.of.network:8545">
     </div>
+    
+</script>
+
+<!--
+    <div class="form-row">
+        <label for="node-config-input-etherScanKeyPrivate"><i class="fa fa-lock"></i> Etherscan API Key</label>
+        <input type="text" id="node-config-input-etherScanKeyPrivate" placeholder="">
+    </div>
+    
+<script type="text/x-red" data-help-name="ethers-network">
+    
+</script>
+
     <div class="form-row">
         <label for="node-config-input-description"><i class="icon-tag"></i> Description</label>
         <input type="text" id="node-config-input-description" placeholder="">
     </div>
-</script>
-
-<script type="text/x-red" data-help-name="ethers-network">
-    
-</script>
+-->

@@ -6,5 +6,9 @@ module.exports = function(RED) {
         this.name        = config.name;
         this.url         = config.url;
         this.description = config.description;
-    }, {});
+    }, {
+        credentials: {
+			etherScanKeyPrivate: { type: "text" },
+    	}
+    });
 }
