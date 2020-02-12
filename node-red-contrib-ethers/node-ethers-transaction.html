@@ -9,7 +9,7 @@
     defaults: {
       name: { value: undefined },
       network: { value: undefined, required: true, type: 'ethers-network' },
-      wallet: { value: undefined, required: true, type: 'ethjs-wallet' },
+      wallet: { value: undefined, required: true, type: 'ethers-wallet' },
       output: { value: 'payload', required: false },
       outputType: { value: 'msg' },
       wait: { value: false },
@@ -185,7 +185,7 @@
         // WORKS!
         // const v = $("#node-input-contract").typedInput('value');
         const t = type.target.selectedOptions[0].value;
-        console.log('t', t);
+        // console.log('t', t);
 
         if (!t || !RED.nodes.node(t)) {
           // console.log('no node selected');
