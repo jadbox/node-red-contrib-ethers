@@ -14,9 +14,11 @@ npm install node-red-contrib-ethers
 In your node-red settings.js `[~/.node-red/settings.js]`, add an entry for your etherscan key.
 ```javascript
 functionGlobalContext: {
-        etherscan_key: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+        etherscan_key: 'YOUR-ETHERSCAN-API-KEY'
 },
 ```
+
+Restart `node-red` and use the Transaction node under the Ethers category.
 
 ## Authors
 
