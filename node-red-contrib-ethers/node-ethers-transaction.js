@@ -114,9 +114,10 @@ const input = async (RED, node, data, config) => {
 
     
     let contractWithMaybeSigner = contract;
-    if(node.wallet.keyPrivate) {
-        console.log('signing');
-        const wallet = new Wallet(node.wallet.keyPrivate, provider) 
+    // console.log('node.wallet', node.wallet);
+    if(node.wallet.credentials.keyPrivate) {
+        node.log(`signing via wallet pub addr: ${node.wallet.keyPublic}`);
+        const wallet = new ethers.Wallet(node.wallet.credentials.keyPrivate, provider) 
         contractWithMaybeSigner = contract.connect(wallet);
     }
 
