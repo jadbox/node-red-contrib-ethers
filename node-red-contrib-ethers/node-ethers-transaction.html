@@ -203,7 +203,10 @@
           // console.log('reusing data');
           decorateFuncNames(abiData);
         } else
-          $.post('abi', { address: address }, function(data) {
+          $.post('abi', { 
+            address: address, 
+            // network: config.network ? config.network.url : '' 
+          }, function(data) {
             // abiDataAddress
             abiDataAddress = address;
             // console.log('serialports test', data);

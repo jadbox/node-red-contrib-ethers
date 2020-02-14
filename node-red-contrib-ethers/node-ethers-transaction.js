@@ -61,13 +61,17 @@ const getABI = async (node, contract) => {
         // console.log('etherscan use cache', contract);
         return abiCache[contract];
     }
-    node.log(`etherscan_for ${contract}`);
+    
     const gVar = node.context().global;
     const ekey = gVar.get('etherscan_key');
 
-    node.network.url = node.network.url || undefined; //  || 'kovan'
+    node.network.url = node.network ? node.network.url : undefined; //  || 'kovan'
 
-    const api = etherscan.init(ekey, node.network.url, 3000);
+    node.log(`etherscan_for ${contract} net:${node.network.url}`);
+
+    console.log('call')
+
+    const api = etherscan.init(ekey, node.network.url || undefined, 3000);
 
     const abiCall = await (api.contract
         .getabi(contract));
@@ -104,6 +108,12 @@ const input = async (RED, node, data, config) => {
         return;
     } */
 
+    if(!node.network) {
+        return;
+    }
+
+    node.log(`Connecting to ${node.network.url}`);
+
     const abi = await getABI(node, contractAddr);
 
     const funcName = config.apiCall; // 'balanceOf';
@@ -113,24 +123,22 @@ const input = async (RED, node, data, config) => {
     // console.log('abi', abi);
 
     // TODO make provider configurable
-    if(!node.network) {
-        return;
-    }
-
-    node.log(`Connecting to ${node.network.url}`);
+    
     const provider = ethers.getDefaultProvider(node.network.url || 'kovan');
 
 
     contract = new ethers.Contract(contractAddr, abi, provider);
 
     
-    let contractWithMaybeSigner = null;
+    let contractWithMaybeSigner = contract;
+    let isSign = false;
     // console.log('node.wallet', node.wallet);
     if(node.wallet && node.wallet.credentials.keyPrivate) {
         node.log(`signing via wallet pub addr: ${node.wallet.keyPublic}`);
         console.log('pv', node.wallet.credentials.keyPrivate);
         const wallet = new ethers.Wallet(node.wallet.credentials.keyPrivate, provider) 
         contractWithMaybeSigner = contract.connect(wallet);
+        isSign = true;
     }
 
     const paymentString = getPropByType(RED, config, data, 'ether');
@@ -152,7 +160,7 @@ const input = async (RED, node, data, config) => {
     const tx = await contractWithMaybeSigner[funcName](...paramsWithOverrides); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
 
     let result = "";
-    if(contractWithMaybeSigner) {
+    if(isSign) {
         // See: https://ropsten.etherscan.io/tx/0xaf0068dcf728afa5accd02172867627da4e6f946dfb8174a7be31f01b11d5364
         node.log(`Waiting on transaction: ${tx.hash}`);
         // "0xaf0068dcf728afa5accd02172867627da4e6f946dfb8174a7be31f01b11d5364"
