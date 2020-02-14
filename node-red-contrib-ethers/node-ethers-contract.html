@@ -2,8 +2,8 @@
     RED.nodes.registerType('ethers-contract',{
         category: 'config',
         defaults: {
-            name       : { value: 'Kovan Test Contract' },
-            address    : { value: '0x4F96Fe3b7A6Cf9725f59d353F723c1bDb64CA6Aa' },
+            name       : { value: undefined, required: true },
+            address    : { value: undefined, required: true },
             // transaction: { value: undefined },
             abi        : { value: undefined }
         },

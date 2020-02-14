@@ -2,7 +2,7 @@
     RED.nodes.registerType('ethers-network',{
         category: 'config',
         defaults: {
-            name       : { value: undefined },
+            name       : { value: undefined, required: true },
             url        : { value: undefined, required: true },
             description: { value: undefined },
         },

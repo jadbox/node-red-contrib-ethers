@@ -2,8 +2,8 @@
     RED.nodes.registerType('ethers-wallet',{
         category: 'config',
         defaults: {
-            name:       { value: undefined },
-            keyPublic:  { value: undefined },
+            name:       { value: undefined, required: true  },
+            keyPublic:  { value: undefined, required: true },
         },
         credentials: {
             keyPrivate: { value: undefined },
