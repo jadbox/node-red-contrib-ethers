@@ -65,7 +65,7 @@ const getABI = async (node, contract) => {
     const gVar = node.context().global;
     const ekey = gVar.get('etherscan_key');
 
-    node.network.url = node.network ? node.network.url : undefined; //  || 'kovan'
+    node.network.url = node.network ? node.network.url : 'kovan'; //  || 'kovan'
 
     node.log(`etherscan_for ${contract} net:${node.network.url}`);
 

@@ -4,7 +4,7 @@ module.exports = function(RED) {
     RED.nodes.registerType("ethers-network", function(config){
         RED.nodes.createNode(this, config);
         this.name        = config.name;
-        this.url         = config.url;
+        this.url         = config.url || 'kovan';
         this.description = config.description;
     }, {
         credentials: {
