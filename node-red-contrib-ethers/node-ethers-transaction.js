@@ -92,6 +92,7 @@ const input = async (RED, node, data, config) => {
     // console.log(config);
 
     const configParams = config.params;
+    console.log('configParams', configParams);
     // const len = Math.max(configParams.length, payloadParams.length);
 
     const params = configParams.map((x, i) => {
@@ -155,9 +156,9 @@ const input = async (RED, node, data, config) => {
         value: payment
     }]);
 
-    node.log(`call ${contractAddr} with: ${JSON.stringify(paramsWithOverrides)}`);
+    node.log(`call ${contractAddr} ${funcName} with: ${JSON.stringify(paramsWithOverrides)}`);
 
-    const tx = await contractWithMaybeSigner[funcName](...paramsWithOverrides); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
+    const tx = await contractWithMaybeSigner[funcName].apply(contractWithMaybeSigner, paramsWithOverrides); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
 
     let result = "";
     if(isSign) {

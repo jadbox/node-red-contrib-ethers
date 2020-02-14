@@ -75,6 +75,7 @@
           $('#contract-params').html(`<b>No contract ABI found</b><br/>`);
           return;
         }
+        if(!type || !type.target || !type.target.selectedOptions[0]) return;
         const selectedFunc = type ? type.target.selectedOptions[0].value : node.apiCall;
 
         // console.log('selectedFunc', selectedFunc);
