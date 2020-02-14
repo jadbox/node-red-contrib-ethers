@@ -92,10 +92,10 @@ const input = async (RED, node, data, config) => {
     // console.log(config);
 
     const configParams = config.params;
-    console.log('configParams', configParams);
+    // console.log('configParams', configParams);
     // const len = Math.max(configParams.length, payloadParams.length);
 
-    const params = configParams.map((x, i) => {
+    let params = configParams.map((x, i) => {
         if (x && x.indexOf('payload') === 0) {
             return RED.util.getMessageProperty(data, x);
         }
@@ -153,24 +153,27 @@ const input = async (RED, node, data, config) => {
     const paymentString = getPropByType(RED, config, data, 'ether');
     const payment = paymentString ? ethers.utils.parseEther(paymentString) : undefined;
 
-    let paramsWithOverrides = {
-            // The address to execute the call as
-        from: getPropByType(RED, config, data, 'address') || undefined, // "0x0123456789012345678901234567890123456789",
+    let paramsWithOverrides = {};
+     // "0x0123456789012345678901234567890123456789",
 
-        // The maximum units of gas for the transaction to use
-        // gasPrice: node.gasPrice || undefined,
-        gasLimit: getPropByType(RED, config, data, 'gaslimit') || undefined,
-        // value: node.ether || undefined,
-        value: payment
-    };
+    const propAddress = getPropByType(RED, config, data, 'address'); // || node.wallet.keyPublic;
+    if(propAddress) paramsWithOverrides.from = propAddress;
+
+    const gasLimit = getPropByType(RED, config, data, 'gaslimit');
+    if(gasLimit) paramsWithOverrides.gasLimit = gasLimit;
+
+    const propValue = getPropByType(RED, config, data, 'value');
+    if(propValue) paramsWithOverrides.value = propValue;
 
     if(Object.values(paramsWithOverrides).filter(x=>!!x).length > 0) {
         params = params.concat([paramsWithOverrides]);
     }
 
-    node.log(`call ${contractAddr} ${funcName} with: ${JSON.stringify(paramsWithOverrides)}`);
+    node.log(`call ${contractAddr} ${funcName} with: ${JSON.stringify(params)}`);
 
     const tx = await contractWithMaybeSigner[funcName].apply(contractWithMaybeSigner, params); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
+
+    console.log('tx', JSON.stringify(tx));
 
     let result = "";
     if(isSign) {
