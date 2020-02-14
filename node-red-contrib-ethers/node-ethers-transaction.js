@@ -19,8 +19,9 @@ module.exports = function (RED) {
         if (!config.network) { node.status({ fill: "red", shape: "ring", text: 'Missing network' }); }
         else { node.network = RED.nodes.getNode(config.network); }
 
-        if (!config.wallet) { node.status({ fill: "red", shape: "ring", text: 'Missing wallet' }); }
-        else { node.wallet = RED.nodes.getNode(config.wallet); }
+        // if (!config.wallet) { node.status({ fill: "red", shape: "ring", text: 'Missing wallet' }); }
+        // else { }
+        node.wallet = RED.nodes.getNode(config.wallet); 
 
         if (!config.contract) { node.status({ fill: "red", shape: "ring", text: 'Missing contract' }); }
         else {
@@ -63,7 +64,10 @@ const getABI = async (node, contract) => {
     node.log(`etherscan_for ${contract}`);
     const gVar = node.context().global;
     const ekey = gVar.get('etherscan_key');
-    const api = etherscan.init(ekey, 'kovan', 3000);
+
+    node.network.url = node.network.url || undefined; //  || 'kovan'
+
+    const api = etherscan.init(ekey, node.network.url, 3000);
 
     const abiCall = await (api.contract
         .getabi(contract));
@@ -108,15 +112,23 @@ const input = async (RED, node, data, config) => {
     // console.log('name setParamInputs', setParamInputs(funcName));
     // console.log('abi', abi);
 
-    const provider = ethers.getDefaultProvider('kovan');
+    // TODO make provider configurable
+    if(!node.network) {
+        return;
+    }
+
+    node.log(`Connecting to ${node.network.url}`);
+    const provider = ethers.getDefaultProvider(node.network.url || 'kovan');
+
 
     contract = new ethers.Contract(contractAddr, abi, provider);
 
     
-    let contractWithMaybeSigner = contract;
+    let contractWithMaybeSigner = null;
     // console.log('node.wallet', node.wallet);
-    if(node.wallet.credentials.keyPrivate) {
+    if(node.wallet && node.wallet.credentials.keyPrivate) {
         node.log(`signing via wallet pub addr: ${node.wallet.keyPublic}`);
+        console.log('pv', node.wallet.credentials.keyPrivate);
         const wallet = new ethers.Wallet(node.wallet.credentials.keyPrivate, provider) 
         contractWithMaybeSigner = contract.connect(wallet);
     }
@@ -137,9 +149,21 @@ const input = async (RED, node, data, config) => {
 
     node.log(`call ${contractAddr} with: ${JSON.stringify(paramsWithOverrides)}`);
 
-    let tx = await contractWithMaybeSigner[funcName](...paramsWithOverrides); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
+    const tx = await contractWithMaybeSigner[funcName](...paramsWithOverrides); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
 
-    const result = tx.toString();
+    let result = "";
+    if(contractWithMaybeSigner) {
+        // See: https://ropsten.etherscan.io/tx/0xaf0068dcf728afa5accd02172867627da4e6f946dfb8174a7be31f01b11d5364
+        node.log(`Waiting on transaction: ${tx.hash}`);
+        // "0xaf0068dcf728afa5accd02172867627da4e6f946dfb8174a7be31f01b11d5364"
+
+        // The operation is NOT complete yet; we must wait until it is mined
+        await tx.wait();
+        node.log(`Finished transaction: ${tx.hash}`);
+        result = tx.hash;
+    } else {
+        result = tx.toString();
+    }
     // String or Object?
 
     // node.log(tx);

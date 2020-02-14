@@ -9,7 +9,7 @@
     defaults: {
       name: { value: undefined },
       network: { value: undefined, required: true, type: 'ethers-network' },
-      wallet: { value: undefined, required: true, type: 'ethers-wallet' },
+      wallet: { value: undefined, required: false, type: 'ethers-wallet' },
       output: { value: 'payload', required: false },
       outputType: { value: 'msg' },
       wait: { value: false },
@@ -261,7 +261,7 @@
   <h4 class="section">General</h4>
 
   <div class="form-row">
-      <label for="node-input-name"><i class="icon-tag"></i> Label (optional)</label>
+      <label for="node-input-name"><i class="icon-tag"></i> Label [optional]</label>
       <input type="text" id="node-input-name" placeholder="">
   </div>
   <div class="form-row">
@@ -269,7 +269,7 @@
       <input type="text" id="node-input-network" placeholder="">
   </div>
   <div class="form-row">
-      <label for="node-input-wallet"><i class="icon-tag"></i> Wallet</label>
+      <label for="node-input-wallet"><i class="icon-tag"></i> Wallet [optional]</label>
       <input type="text" id="node-input-wallet" placeholder="">
       <div class="input-info">This wallet will sign the transaction</div>
   </div>
