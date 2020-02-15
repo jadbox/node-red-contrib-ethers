@@ -65,7 +65,7 @@ const getABI = async (node, contract) => {
     const gVar = node.context().global;
     const ekey = gVar.get('etherscan_key');
 
-    node.network.url = node.network ? node.network.url : 'kovan'; //  || 'kovan'
+    node.network.url = (node.network ? node.network.url : 'kovan') || 'kovan'; //  || 'kovan'
 
     node.log(`etherscan_for ${contract} net:${node.network.url}`);
 
@@ -150,8 +150,8 @@ const input = async (RED, node, data, config) => {
         isSign = false;
     }
 
-    const paymentString = getPropByType(RED, config, data, 'ether');
-    const payment = paymentString ? ethers.utils.parseEther(paymentString) : undefined;
+    // const paymentString = getPropByType(RED, config, data, 'ether');
+    // const payment = paymentString ? ethers.utils.parseEther(paymentString) : undefined;
 
     let paramsWithOverrides = {};
      // "0x0123456789012345678901234567890123456789",
@@ -162,7 +162,7 @@ const input = async (RED, node, data, config) => {
     const gasLimit = getPropByType(RED, config, data, 'gaslimit');
     if(gasLimit) paramsWithOverrides.gasLimit = gasLimit;
 
-    const propValue = getPropByType(RED, config, data, 'value');
+    const propValue = getPropByType(RED, config, data, 'ether');
     if(propValue) paramsWithOverrides.value = propValue;
 
     if(Object.values(paramsWithOverrides).filter(x=>!!x).length > 0) {
@@ -176,7 +176,7 @@ const input = async (RED, node, data, config) => {
     console.log('tx', JSON.stringify(tx));
 
     let result = "";
-    if(isSign) {
+    if(isSign && !!tx.wait) {
         // See: https://ropsten.etherscan.io/tx/0xaf0068dcf728afa5accd02172867627da4e6f946dfb8174a7be31f01b11d5364
         node.log(`Waiting on transaction: ${tx.hash}`);
         // "0xaf0068dcf728afa5accd02172867627da4e6f946dfb8174a7be31f01b11d5364"
