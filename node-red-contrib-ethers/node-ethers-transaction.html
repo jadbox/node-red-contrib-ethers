@@ -46,10 +46,10 @@
     align: 'left',
     paletteLabel: 'Transaction',
     hasValue: true,
-    label: function() {
+    label: function () {
       return this.name || 'Ethereum Transaction';
     },
-    oneditprepare: function() {
+    oneditprepare: function () {
       const node = this;
       // console.log('oneditprepare');
       if (!this.outputType) this.outputType = 'msg';
@@ -76,12 +76,17 @@
           $('#contract-params').html(`<b>No contract ABI found</b><br/>`);
           return;
         }
-        if(!type || !type.target || !type.target.selectedOptions[0]) return;
+        if (!type || !type.target || !type.target.selectedOptions[0]) return;
         const selectedFunc = type ? type.target.selectedOptions[0].value : node.apiCall;
 
         // console.log('selectedFunc', selectedFunc);
 
         const abiFuncI = abiData.filter(x => x.name === selectedFunc)[0];
+
+        if(!abiFuncI) {
+          console.log('no matching function');
+          return;
+        }
 
         // console.log('abiData', abiData);
 
@@ -90,7 +95,7 @@
         const isStateChange = abiFuncI.stateMutability.indexOf('payable') > -1;
         const isPayable = abiFuncI.payable === true;
 
-        if(isPayable || isStateChange) {
+        if (isPayable || isStateChange) {
           $('#optionalEther').show();
           $('#optionalFrom').show();
           $('#optionalLimit').show();
@@ -183,6 +188,11 @@
         $('#node-input-apiCall').trigger('change');
       };
 
+      $('#node-input-etherscan').on('change', (type, value) => {
+        // this.node = 
+        $('#node-input-contract').trigger('change');
+      });
+
       $('#node-input-contract').on('change', (type, value) => {
         // WORKS!
         // const v = $("#node-input-contract").typedInput('value');
@@ -196,22 +206,40 @@
           $('#node-input-api-info').empty();
           return;
         }
-        // console.log('type', type, t);
-        // console.log('t', t, t.selectedOptions[0].value);
         const address = RED.nodes.node(t).address;
+
+        const network = this.network ? RED.nodes.node(this.network).url : undefined;
+        const etherscan = this.etherscan ? RED.nodes.node(this.etherscan) : undefined;
+
+        let etherscanKey = '';
+        if(etherscan && etherscan.credentials) {
+          etherscanKey = etherscan.credentials.keyPrivate;
+        } else {
+          console.log('no etherscan key field', this.etherscan, etherscan);
+          return;
+        }
+
         // console.log('change node', address);
 
         if ((abiDataAddress === address || !abiDataAddress) && abiData) {
           // console.log('reusing data');
           decorateFuncNames(abiData);
-        } else
-          $.post('abi', { 
-            address: address, 
-            // network: config.network ? config.network.url : '' 
-          }, function(data) {
+        } else {
+          console.log('etherscan address:', address, 'network:', network, 'etherscanKey:', etherscanKey);
+
+          $.post('abi', {
+            address: address,
+            network: network || '',
+            etherscan: etherscanKey || '' // config.etherscan ? config.etherscan.credentials.keyPrivate : ''
+          }, function (data) {
             // abiDataAddress
             abiDataAddress = address;
+            
             // console.log('serialports test', data);
+            if(!data.funcs) {
+              onABI();
+              return;
+            }
 
             /// $('#node-input-apiCall').typedInput({default: '', types:data.funcs.map(x=>x.name)});
             const t = data.funcs.map(x => x.name);
@@ -222,19 +250,20 @@
             // Populate params
             onABI();
           });
+        }
       });
       // $("#node-input-ether").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-etherType") });
     },
-    oneditcancel: function() {
+    oneditcancel: function () {
       // console.log('oneditcancel transaction');
     },
-    oneditsave: function() {
+    oneditsave: function () {
       // console.log('oneditsave transaction');
       const ns = $('#contract-params [id^="node-input-param"]');
       if (ns.length === 0) console.log('no params found');
 
       const params = new Array(ns.length);
-      ns.each(function(x) {
+      ns.each(function (x) {
         const n = $(this)[0];
         const fieldIndex = parseInt(n.id.replace('node-input-param', ''));
         const val = n.value;
@@ -252,11 +281,13 @@
     border-bottom: 1px solid #bbb;
     margin: 1em 0em 1em 0em;
   }
+
   .input-info {
     font-size: 12px;
     padding-left: 104px;
     font-style: italic;
   }
+
   .checkbox-info {
     font-size: 12px;
   }

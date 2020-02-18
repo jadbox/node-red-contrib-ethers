@@ -5,9 +5,9 @@
             name       : { value: undefined, required: true }
         },
         credentials: {
-            keyPrivate: { value: undefined },
+            keyPrivate: { value: undefined, required: true },
         },
-        hasValue: true,
+        // hasValue: true,
         label: function() {
             return this.name || "Etherscan";
         },

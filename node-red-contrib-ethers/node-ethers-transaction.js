@@ -20,9 +20,9 @@ module.exports = function (RED) {
         else { node.network = RED.nodes.getNode(config.network); }
 
         if (!config.etherscan) { node.status({ fill: "red", shape: "ring", text: 'Missing Etherscan Key' }); }
-        else { node.etherscanKey = RED.nodes.getNode(config.etherscan); }
+        else { node.etherscan = RED.nodes.getNode(config.etherscan); }
 
-        node.wallet = RED.nodes.getNode(config.wallet); 
+        if(config.wallet) node.wallet = RED.nodes.getNode(config.wallet); 
 
         if (!config.contract) { node.status({ fill: "red", shape: "ring", text: 'Missing contract' }); }
         else {
@@ -39,15 +39,17 @@ module.exports = function (RED) {
     RED.httpAdmin.post("/abi", RED.auth.needsPermission('ethers-contract.read'), async function (req, res) {
         // const _contract = node.contract = RED.nodes.getNode(config.contract);
         const addr = req.body.address;
+        const network = req.body.network;
+        const etherscanKey = req.body.etherscan;
 
-        res.json({ funcs: await getABIFuncs(addr) });
+        res.json({ funcs: await getABIFuncs(etherscanKey, network, addr) });
     });
 }
 
-async function getABIFuncs(address) {
-    if (!cacheNode) return;
+async function getABIFuncs(etherscanKey, network, address) {
+    // if (!cacheNode) return;
 
-    const abi2 = await getABI(cacheNode, address);
+    const abi2 = await getABI(etherscanKey, network, address);
     if(!abi2) return;
 
     var iface = new ethers.utils.Interface(abi2)
@@ -59,36 +61,31 @@ async function getABIFuncs(address) {
 }
 
 const abiCache = {};
-const getABI = async (node, contract) => {
-    if (abiCache[contract]) {
+const getABI = async (etherscanKey, network, contract) => {
+    const cacheKey = network + ':' + contract;
+    if (abiCache[cacheKey]) {
         // console.log('etherscan use cache', contract);
-        return abiCache[contract];
-    }
-
-    console.log('node.etherscan', node.etherscan);
-    if(!node.etherscanKey) {
-        console.log('no etherscan key configured');
-        return;
+        return abiCache[cacheKey];
     }
     
     // const gVar = node.context().global;
-    const ekey = node.etherscanKey.credentials.keyPrivate; //gVar.get('etherscan_key');
+    const ekey = etherscanKey; // node.etherscanKey.credentials.keyPrivate; //gVar.get('etherscan_key');
     if(!ekey) throw new Error('no etherscan key');
 
-    node.network.url = (node.network ? node.network.url : 'kovan') || 'kovan'; //  || 'kovan'
+    // node.network.url = (node.network ? node.network.url : 'kovan') || 'kovan'; //  || 'kovan'
 
-    node.log(`etherscan_for ${contract} net:${node.network.url}`);
+    console.log(`etherscan_for ${contract} net:${network}`);
 
     // console.log('call')
 
-    const api = etherscan.init(ekey, node.network.url || undefined, 3000);
+    const api = etherscan.init(ekey, network || undefined, 3000);
 
     const abiCall = await (api.contract
         .getabi(contract));
 
     const result = abiCall.result;
 
-    return abiCache[contract] = result;
+    return abiCache[cacheKey] = result;
 }
 
 const input = async (RED, node, data, config) => {
@@ -120,13 +117,17 @@ const input = async (RED, node, data, config) => {
         return;
     } */
 
-    if(!node.network || !node.etherscan) {
+    if(!node.network || !node.etherscan || !node.etherscan.credentials) {
+        console.log('no network or cred');
         return;
     }
 
     node.log(`Connecting to ${node.network.url}`);
 
-    const abi = await getABI(node, contractAddr);
+    const network = node.network.url;
+    const key = node.etherscan.credentials.keyPrivate;
+
+    const abi = await getABI(key, network, contractAddr);
 
     const funcName = config.apiCall; // 'balanceOf';
 
@@ -137,10 +138,6 @@ const input = async (RED, node, data, config) => {
     // TODO make provider configurable
     
     const provider = ethers.getDefaultProvider(node.network.url || 'kovan');
-
-
-    
-
     
     let contractWithMaybeSigner = new ethers.Contract(contractAddr, abi, provider);
     let isSign = false;
