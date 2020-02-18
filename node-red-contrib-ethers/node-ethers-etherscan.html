@@ -1,0 +1,42 @@
+<script type="text/javascript">
+    RED.nodes.registerType('ethers-etherscan',{
+        category: 'config',
+        defaults: {
+            name       : { value: undefined, required: true }
+        },
+        credentials: {
+            keyPrivate: { value: undefined },
+        },
+        hasValue: true,
+        label: function() {
+            return this.name || "Etherscan";
+        },
+        oneditprepare: function() {
+        },
+        oneditsave: function() {
+        },
+    });
+</script>
+
+<script type="text/x-red" data-template-name="ethers-etherscan">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-config-input-name" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-keyPrivate"><i class="fa fa-lock"></i> PrivateKey</label>
+        <input type="text" id="node-config-input-keyPrivate" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="ethers-etherscan">
+    
+</script>
+
+<!--
+    <div class="form-row"><span style="float: right; line-height: 0px;">Optional</span></div>
+    <div class="form-row">
+        <label for="node-config-input-abi"><i class="icon-tag"></i> Abi</label>
+        <textarea id="node-config-input-abi" rows="3" style="width:300px" placeholder="JSON content of the ABI file"></textarea>
+    </div>
+-->

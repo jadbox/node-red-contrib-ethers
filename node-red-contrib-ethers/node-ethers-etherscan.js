@@ -1,0 +1,14 @@
+module.exports = function(RED) {
+
+    // CREDENTIALS
+    RED.nodes.registerType("ethers-etherscan", function(config){
+        RED.nodes.createNode(this, config);
+        let node = this;
+        this.name        = config.name;
+    }, {
+        credentials: {
+			keyPrivate: { type: "text" },
+    	}
+    });
+    
+}
