@@ -22,6 +22,7 @@
     ],
     "node-red": {
         "nodes": {
+            "ethers-etherscan": "node-ethers-etherscan.js",
             "ethers-wallet": "node-ethers-wallet.js",
             "ethers-contract": "node-ethers-contract.js",
             "ethers-transaction": "node-ethers-transaction.js",

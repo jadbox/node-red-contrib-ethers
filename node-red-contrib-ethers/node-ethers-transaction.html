@@ -8,6 +8,7 @@
     color: '#a3b5d2',
     defaults: {
       name: { value: undefined },
+      etherscan: { value: undefined, required: true, type: 'ethers-etherscan' },
       network: { value: undefined, required: true, type: 'ethers-network' },
       wallet: { value: undefined, required: false, type: 'ethers-wallet' },
       output: { value: 'payload', required: false },
@@ -268,6 +269,11 @@
       <label for="node-input-name"><i class="icon-tag"></i> Label [optional]</label>
       <input type="text" id="node-input-name" placeholder="">
   </div>
+  <div class="form-row">
+    <label for="node-input-etherscan"><i class="icon-tag"></i> Etherscan API Key</label>
+    <input type="text" id="node-input-etherscan" placeholder="">
+    <div class="input-info">Get your key from etherscan.io</div>
+</div>
   <div class="form-row">
       <label for="node-input-network"><i class="icon-tag"></i> Network</label>
       <input type="text" id="node-input-network" placeholder="">

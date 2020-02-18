@@ -19,8 +19,9 @@ module.exports = function (RED) {
         if (!config.network) { node.status({ fill: "red", shape: "ring", text: 'Missing network' }); }
         else { node.network = RED.nodes.getNode(config.network); }
 
-        // if (!config.wallet) { node.status({ fill: "red", shape: "ring", text: 'Missing wallet' }); }
-        // else { }
+        if (!config.etherscan) { node.status({ fill: "red", shape: "ring", text: 'Missing Etherscan Key' }); }
+        else { node.etherscanKey = RED.nodes.getNode(config.etherscan); }
+
         node.wallet = RED.nodes.getNode(config.wallet); 
 
         if (!config.contract) { node.status({ fill: "red", shape: "ring", text: 'Missing contract' }); }
@@ -47,6 +48,8 @@ async function getABIFuncs(address) {
     if (!cacheNode) return;
 
     const abi2 = await getABI(cacheNode, address);
+    if(!abi2) return;
+
     var iface = new ethers.utils.Interface(abi2)
 
     // console.log('iface', iface.functions);
@@ -61,15 +64,22 @@ const getABI = async (node, contract) => {
         // console.log('etherscan use cache', contract);
         return abiCache[contract];
     }
+
+    console.log('node.etherscan', node.etherscan);
+    if(!node.etherscanKey) {
+        console.log('no etherscan key configured');
+        return;
+    }
     
-    const gVar = node.context().global;
-    const ekey = gVar.get('etherscan_key');
+    // const gVar = node.context().global;
+    const ekey = node.etherscanKey.credentials.keyPrivate; //gVar.get('etherscan_key');
+    if(!ekey) throw new Error('no etherscan key');
 
     node.network.url = (node.network ? node.network.url : 'kovan') || 'kovan'; //  || 'kovan'
 
     node.log(`etherscan_for ${contract} net:${node.network.url}`);
 
-    console.log('call')
+    // console.log('call')
 
     const api = etherscan.init(ekey, node.network.url || undefined, 3000);
 
@@ -92,7 +102,7 @@ const input = async (RED, node, data, config) => {
     // console.log(config);
 
     const configParams = config.params;
-    // console.log('configParams', configParams);
+    console.log('configParams', configParams);
     // const len = Math.max(configParams.length, payloadParams.length);
 
     let params = configParams.map((x, i) => {
@@ -101,6 +111,7 @@ const input = async (RED, node, data, config) => {
         }
         return x;
     });
+    // console.log('params', params);
 
     const contractAddr = node.contract.address;
 
@@ -109,7 +120,7 @@ const input = async (RED, node, data, config) => {
         return;
     } */
 
-    if(!node.network) {
+    if(!node.network || !node.etherscan) {
         return;
     }
 
@@ -136,7 +147,6 @@ const input = async (RED, node, data, config) => {
     // console.log('node.wallet', node.wallet);
     if(node.wallet && node.wallet.credentials.keyPrivate) {
         node.log(`signing via wallet pub addr: ${node.wallet.keyPublic}`);
-        console.log('pv', node.wallet.credentials.keyPrivate);
 
         // const wallet = ethers.Wallet.fromMnemonic(mnemonic);
         const wallet = new ethers.Wallet(node.wallet.credentials.keyPrivate, provider);

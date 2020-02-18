@@ -11,12 +11,8 @@ In your node-red project directory for your flow, run:
 npm install node-red-contrib-ethers
 ```
 
-In your node-red settings.js `[~/.node-red/settings.js]`, add an entry for your etherscan key.
-```javascript
-functionGlobalContext: {
-        etherscan_key: 'YOUR-ETHERSCAN-API-KEY'
-},
-```
+Note: You will need an Etherscan API key to properly configure the Transaction node for fetching contract interfaces.
+
 
 Restart `node-red` and use the Transaction node under the Ethers category.
 
