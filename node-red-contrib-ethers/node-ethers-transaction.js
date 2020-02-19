@@ -35,12 +35,17 @@ module.exports = function (RED) {
     }
     RED.nodes.registerType("ethers-transaction", register, {});
 
-    console.log('RED.settings', RED.settings);
+    // console.log('RED.settings', RED.settings, RED.settings.get('etherscan_key'));
+
     RED.httpAdmin.post("/abi", RED.auth.needsPermission('ethers-contract.read'), async function (req, res) {
-        // const _contract = node.contract = RED.nodes.getNode(config.contract);
+        console.log('node', req.body.etherscan);
+        
+        const etherscanKey2 = node.contract = RED.nodes.getNode(req.body.etherscan);
+        console.log('etherscanKey2', etherscanKey2);
+
         const addr = req.body.address;
         const network = req.body.network;
-        const etherscanKey = req.body.etherscan;
+        const etherscanKey = etherscanKey2.credentials.keyPrivate; // req.body.etherscan;
 
         res.json({ funcs: await getABIFuncs(etherscanKey, network, addr) });
     });

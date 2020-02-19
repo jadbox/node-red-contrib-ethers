@@ -220,7 +220,7 @@
           etherscanKey = etherscan.credentials.keyPrivate;
         } else {
           console.log('no etherscan key field', this.etherscan, etherscan);
-          return;
+          // return;
         }
 
         // console.log('change node', address);
@@ -234,7 +234,7 @@
           $.post('abi', {
             address: address,
             network: network || '',
-            etherscan: etherscanKey || '' // config.etherscan ? config.etherscan.credentials.keyPrivate : ''
+            etherscan: this.etherscan || '' // config.etherscan ? config.etherscan.credentials.keyPrivate : ''
           }, function (data) {
             // abiDataAddress
             abiDataAddress = address;
