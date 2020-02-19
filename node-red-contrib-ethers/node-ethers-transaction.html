@@ -40,7 +40,7 @@
       typeParam6: { value: undefined }
     },
     credentials: {
-      etherscan: { value: undefined, required: true },
+      etherscan: { value: undefined, required: false },
     },
     inputs: 1,
     outputs: 1,
@@ -228,7 +228,7 @@
           return;
         }
         const address = RED.nodes.node(t).address;
-
+        
         let network = this.network ? RED.nodes.node(this.network).url : undefined;
         if(!network) {
           const n = $('#node-input-network').val();
@@ -254,6 +254,11 @@
 
         // console.log('change node', address);
 
+        const contractNodeAbi = RED.nodes.node(t).abi || null;
+        /* if (!!contractNodeAbi) {
+          console.log('contractNodeAbi', contractNodeAbi);
+          decorateFuncNames(contractNodeAbi);
+        } */
         if ((abiDataAddress === address || !abiDataAddress) && abiData) {
           // console.log('reusing data');
           decorateFuncNames(abiData);
@@ -267,6 +272,7 @@
           $.post('abi', {
             address: address,
             network: network || '',
+            abi: contractNodeAbi,
             etherscan: etherscan || '' // config.etherscan ? config.etherscan.credentials.keyPrivate : ''
           }, function (data) {
             // abiDataAddress
