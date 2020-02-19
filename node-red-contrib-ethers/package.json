@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-ethers",
-    "version": "0.9.5",
+    "version": "0.9.6",
     "author": "Jonathan Dunlap <jdunlap@outlook.com> (https://https://twitter.com/jadbox)",
     "description": "Simply call etherium contracts from node-red, powered by Ethers.js and Etherscan",
     "dependencies": {
