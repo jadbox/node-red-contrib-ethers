@@ -2,7 +2,7 @@
     RED.nodes.registerType('ethers-network',{
         category: 'config',
         defaults: {
-            name       : { value: undefined, required: true },
+            name       : { value: undefined, required: false },
             url        : { value: 'kovan', required: true }
             // description: { value: undefined },
         },
@@ -10,16 +10,12 @@
             etherScanKeyPrivate: { value: undefined, required: false },
         },
         label: function() {
-            return this.name || "Ethereum Network";
+            return this.name || this.url || "Ethereum Network";
         }
     });
 </script>
 
 <script type="text/x-red" data-template-name="ethers-network">
-    <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-config-input-name" placeholder="">
-    </div>
     <div class="form-row">
         <label for="node-config-input-url"><i class="icon-tag"></i> URL</label>
         <select id="node-input-url" style="width:auto">
@@ -28,6 +24,10 @@
             <option value="rinkeby">rinkeby</option>
             <option value="ropsten">ropsten</option>
         </select>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name [optional]</label>
+        <input type="text" id="node-config-input-name" placeholder="">
     </div>
     
 </script>

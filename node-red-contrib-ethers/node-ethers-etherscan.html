@@ -1,30 +1,27 @@
 <script type="text/javascript">
-    RED.nodes.registerType('ethers-contract',{
+    RED.nodes.registerType('ethers-etherscan',{
         category: 'config',
         defaults: {
-            name       : { value: undefined, required: false },
-            address    : { value: undefined, required: true },
-            // transaction: { value: undefined },
-            // abi        : { value: undefined }
+            name       : { value: undefined, required: false }
+        },
+        credentials: {
+            keyPrivate: { value: undefined, required: true },
         },
         hasValue: true,
         label: function() {
-            return this.name || this.address || "Ethereum Contract";
+            return this.name || "My Key";
         },
         oneditprepare: function() {
-            // console.log('oneditprepare contract');
         },
         oneditsave: function() {
-            // console.log('oneditsave contract');
-            // this.emit('oneditsave', this.address);
         },
     });
 </script>
 
-<script type="text/x-red" data-template-name="ethers-contract">
+<script type="text/x-red" data-template-name="ethers-etherscan">
     <div class="form-row">
-        <label for="node-config-input-address"><i class="icon-tag"></i> Address</label>
-        <input type="text" id="node-config-input-address" placeholder="">
+        <label for="node-config-input-keyPrivate"><i class="fa fa-lock"></i> PrivateKey</label>
+        <input type="text" id="node-config-input-keyPrivate" placeholder="">
     </div>
     <div class="form-row">
         <label for="node-config-input-name"><i class="icon-tag"></i> Name [optional]</label>
@@ -32,7 +29,7 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="ethers-contract">
+<script type="text/x-red" data-help-name="ethers-etherscan">
     
 </script>
 
