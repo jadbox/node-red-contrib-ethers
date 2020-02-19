@@ -2,14 +2,14 @@
     RED.nodes.registerType('ethers-etherscan',{
         category: 'config',
         defaults: {
-            name       : { value: undefined, required: true }
+            name       : { value: undefined, required: false }
         },
         credentials: {
             keyPrivate: { value: undefined, required: true },
         },
         hasValue: true,
         label: function() {
-            return this.name || "Etherscan";
+            return this.name || "My Key";
         },
         oneditprepare: function() {
         },
@@ -20,12 +20,12 @@
 
 <script type="text/x-red" data-template-name="ethers-etherscan">
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-config-input-name" placeholder="">
-    </div>
-    <div class="form-row">
         <label for="node-config-input-keyPrivate"><i class="fa fa-lock"></i> PrivateKey</label>
         <input type="text" id="node-config-input-keyPrivate" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name [optional]</label>
+        <input type="text" id="node-config-input-name" placeholder="">
     </div>
 </script>
 

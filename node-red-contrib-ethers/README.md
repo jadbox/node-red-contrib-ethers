@@ -13,7 +13,6 @@ npm install node-red-contrib-ethers
 
 Note: You will need an Etherscan API key to properly configure the Transaction node for fetching contract interfaces.
 
-
 Restart `node-red` and use the Transaction node under the Ethers category.
 
 ## Authors

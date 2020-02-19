@@ -2,14 +2,14 @@
     RED.nodes.registerType('ethers-contract',{
         category: 'config',
         defaults: {
-            name       : { value: undefined, required: true },
+            name       : { value: undefined, required: false },
             address    : { value: undefined, required: true },
             // transaction: { value: undefined },
-            abi        : { value: undefined }
+            // abi        : { value: undefined }
         },
         hasValue: true,
         label: function() {
-            return this.name || "Ethereum Contract";
+            return this.name || this.address || "Ethereum Contract";
         },
         oneditprepare: function() {
             console.log('oneditprepare contract');
@@ -23,12 +23,12 @@
 
 <script type="text/x-red" data-template-name="ethers-contract">
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-config-input-name" placeholder="">
-    </div>
-    <div class="form-row">
         <label for="node-config-input-address"><i class="icon-tag"></i> Address</label>
         <input type="text" id="node-config-input-address" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="icon-tag"></i> Name [optional]</label>
+        <input type="text" id="node-config-input-name" placeholder="">
     </div>
 </script>
 

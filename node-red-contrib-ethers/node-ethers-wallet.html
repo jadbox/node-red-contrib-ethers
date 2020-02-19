@@ -9,7 +9,7 @@
             keyPrivate: { value: undefined },
         },
         label: function() {
-            return this.name || "Ethereum Wallet";
+            return this.name || this.keyPublic ? ('Pub:' + this.keyPublic) : "My Wallet";
         }
     });
 </script>
