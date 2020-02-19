@@ -85,6 +85,9 @@ async function getABIFuncs(etherscanKey, network, address, abi) {
 
 const abiCache = {};
 const getABI = async (etherscanKey, network, contract) => {
+    // convert from etherjs to etherscan-api
+    if(network && network.indexOf('homestead') === 0) network = undefined;
+
     const cacheKey = network + ':' + contract;
     if (abiCache[cacheKey]) {
         // console.log('etherscan use cache', contract);
