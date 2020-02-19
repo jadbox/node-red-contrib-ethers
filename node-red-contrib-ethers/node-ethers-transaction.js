@@ -35,7 +35,7 @@ module.exports = function (RED) {
     }
     RED.nodes.registerType("ethers-transaction", register, {});
 
-
+    console.log('RED.settings', RED.settings);
     RED.httpAdmin.post("/abi", RED.auth.needsPermission('ethers-contract.read'), async function (req, res) {
         // const _contract = node.contract = RED.nodes.getNode(config.contract);
         const addr = req.body.address;
