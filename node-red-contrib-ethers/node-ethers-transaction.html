@@ -47,7 +47,12 @@
     paletteLabel: 'Transaction',
     hasValue: true,
     label: function () {
-      return this.name || 'Ethereum Transaction';
+      const contract = this.contract ? RED.nodes.node(this.contract).address : '';
+      const func = this.apiCall || '';
+
+      const confunc = (contract && func) ? (func + ':' + contract).substr(0, 14) : '';
+
+      return this.name || confunc || 'Ethereum Transaction';
     },
     oneditprepare: function () {
       const node = this;
