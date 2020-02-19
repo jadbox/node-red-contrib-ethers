@@ -39,17 +39,34 @@
       param6: { value: undefined },
       typeParam6: { value: undefined }
     },
+    credentials: {
+      etherscan: { value: undefined, required: true },
+    },
     inputs: 1,
     outputs: 1,
     icon: 'ethjs.png',
     align: 'left',
     paletteLabel: 'Transaction',
     hasValue: true,
-    label: function() {
-      return this.name || 'Ethereum Transaction';
+    label: function () {
+      const contract = this.contract ? RED.nodes.node(this.contract).address : '';
+      const func = this.apiCall || '';
+
+      const confunc = (contract && func) ? (func + ':' + contract).substr(0, 14) : '';
+
+      return this.name || confunc || 'Ethereum Transaction';
     },
-    oneditprepare: function() {
+    oneditprepare: function () {
       const node = this;
+      // console.log('node', RED.settings, RED.settings.etherscanKey);
+
+      // console.log('this', this.context);
+
+      if(!$('#node-input-etherscan').val() && window.etherscanKey) {
+        // flow.set('etherscanKey', $('#node-input-etherscan').val() || '');
+        $('#node-input-etherscan').val( window.etherscanKey );
+      }
+
       // console.log('oneditprepare');
       if (!this.outputType) this.outputType = 'msg';
       $('#node-input-output').typedInput({ default: 'msg', types: ['msg'], typeField: $('#node-input-outputType') });
@@ -75,21 +92,25 @@
           $('#contract-params').html(`<b>No contract ABI found</b><br/>`);
           return;
         }
-        if(!type || !type.target || !type.target.selectedOptions[0]) return;
+        if (!type || !type.target || !type.target.selectedOptions[0]) return;
         const selectedFunc = type ? type.target.selectedOptions[0].value : node.apiCall;
 
         // console.log('selectedFunc', selectedFunc);
 
         const abiFuncI = abiData.filter(x => x.name === selectedFunc)[0];
 
-        // console.log('abiData', abiData);
+        if(!abiFuncI) {
+          console.log('no matching function');
+          return;
+        }
 
+        // console.log('abiData', abiData);
         // console.log('abiFuncI', abiFuncI);
 
         const isStateChange = abiFuncI.stateMutability.indexOf('payable') > -1;
         const isPayable = abiFuncI.payable === true;
 
-        if(isPayable || isStateChange) {
+        if (isPayable || isStateChange) {
           $('#optionalEther').show();
           $('#optionalFrom').show();
           $('#optionalLimit').show();
@@ -182,6 +203,17 @@
         $('#node-input-apiCall').trigger('change');
       };
 
+      $('#node-input-network').on('change', (type, value) => {
+        // this.node = 
+        $('#node-input-contract').trigger('change');
+      });
+
+      $('#node-input-etherscan').on('change', (type, value) => {
+        // this.node = 
+        $('#node-input-contract').trigger('change');
+      });
+
+      const requestDebounce = {};
       $('#node-input-contract').on('change', (type, value) => {
         // WORKS!
         // const v = $("#node-input-contract").typedInput('value');
@@ -195,22 +227,56 @@
           $('#node-input-api-info').empty();
           return;
         }
-        // console.log('type', type, t);
-        // console.log('t', t, t.selectedOptions[0].value);
         const address = RED.nodes.node(t).address;
+
+        let network = this.network ? RED.nodes.node(this.network).url : undefined;
+        if(!network) {
+          const n = $('#node-input-network').val();
+
+          const netNode = n ? RED.nodes.node(n) : null;
+
+          if(netNode && netNode.url) network = netNode.url;
+          // console.log('network node', n, a, a.url);
+        }
+
+        let etherscan = this.credentials.etherscan; // ? RED.nodes.node(this.etherscan) : undefined;
+
+        // console.log('this', this.credentials, etherscan);
+
+        // get the key right from the input if it hasn't been saved in the Node yet
+        if(!etherscan) {
+          // console.log('no etherscan key field', etherscan, $('node-input-etherscan'));
+          etherscan = $('#node-input-etherscan').val();
+
+          // console.log('etherscan node', etherscan);
+          // return;
+        }
+
         // console.log('change node', address);
 
         if ((abiDataAddress === address || !abiDataAddress) && abiData) {
           // console.log('reusing data');
           decorateFuncNames(abiData);
-        } else
-          $.post('abi', { 
-            address: address, 
-            // network: config.network ? config.network.url : '' 
-          }, function(data) {
+        } else {
+          const requestKey = address + ':' + network + ':' + etherscan;
+          if(requestDebounce[requestKey]) return;
+          // console.log('etherscan address:', requestKey);
+
+          requestDebounce[requestKey] = true;
+
+          $.post('abi', {
+            address: address,
+            network: network || '',
+            etherscan: etherscan || '' // config.etherscan ? config.etherscan.credentials.keyPrivate : ''
+          }, function (data) {
             // abiDataAddress
             abiDataAddress = address;
+            
             // console.log('serialports test', data);
+            if(!data.funcs) {
+              onABI();
+              return;
+            }
 
             /// $('#node-input-apiCall').typedInput({default: '', types:data.funcs.map(x=>x.name)});
             const t = data.funcs.map(x => x.name);
@@ -221,19 +287,20 @@
             // Populate params
             onABI();
           });
+        }
       });
       // $("#node-input-ether").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-etherType") });
     },
-    oneditcancel: function() {
+    oneditcancel: function () {
       // console.log('oneditcancel transaction');
     },
-    oneditsave: function() {
+    oneditsave:  () => {
       // console.log('oneditsave transaction');
       const ns = $('#contract-params [id^="node-input-param"]');
       if (ns.length === 0) console.log('no params found');
 
       const params = new Array(ns.length);
-      ns.each(function(x) {
+      ns.each(function (x) {
         const n = $(this)[0];
         const fieldIndex = parseInt(n.id.replace('node-input-param', ''));
         const val = n.value;
@@ -242,6 +309,17 @@
       });
 
       this.params = params;
+
+      
+      // console.log('flow.get', this);
+
+      // console.log('flow.get', flow.get('etherscanKey'));
+
+      if(!!$('#node-input-etherscan').val()) {
+        window.etherscanKey = $('#node-input-etherscan').val();
+        // flow.set('etherscanKey', $('#node-input-etherscan').val() || '');
+      } 
+      
       // console.log('this.params', this.params);
     }
   });
@@ -251,11 +329,13 @@
     border-bottom: 1px solid #bbb;
     margin: 1em 0em 1em 0em;
   }
+
   .input-info {
     font-size: 12px;
     padding-left: 104px;
     font-style: italic;
   }
+
   .checkbox-info {
     font-size: 12px;
   }
@@ -268,6 +348,11 @@
       <label for="node-input-name"><i class="icon-tag"></i> Label [optional]</label>
       <input type="text" id="node-input-name" placeholder="">
   </div>
+  <div class="form-row">
+    <label for="node-input-etherscan"><i class="icon-tag"></i> Etherscan API</label>
+    <input type="text" id="node-input-etherscan" placeholder="">
+    <div class="input-info">Get your key from etherscan.io</div>
+</div>
   <div class="form-row">
       <label for="node-input-network"><i class="icon-tag"></i> Network</label>
       <input type="text" id="node-input-network" placeholder="">
