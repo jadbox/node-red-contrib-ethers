@@ -4,6 +4,7 @@ This provides a Ethers contract transaction node that uses Ethers.js and Ethersc
 
 It requires a valid Etherscan API key to auto populate the node's configuration panel.
 
+![Screenshot](ethers.png "Screenshot")
 ## Quick Start
 
 In your node-red project directory for your flow, run:
