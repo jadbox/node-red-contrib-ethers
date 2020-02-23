@@ -1,34 +1,50 @@
 <script type="text/javascript">
-    RED.nodes.registerType('ethers-wallet',{
-        category: 'config',
-        defaults: {
-            name:       { value: undefined, required: true  },
-            keyPublic:  { value: undefined, required: true },
-        },
-        credentials: {
-            keyPrivate: { value: undefined },
-        },
-        label: function() {
-            return this.name || (this.keyPublic ? ('Pub:' + this.keyPublic) : "My Wallet");
-        }
-    });
+  RED.nodes.registerType('ethers-wallet', {
+    category: 'config',
+    defaults: {
+      name: { value: undefined, required: true },
+      keyPublic: { value: undefined, required: true },
+      keyPublicType: { value: undefined },
+      keyPrivateType: { value: undefined }
+    },
+    credentials: {
+      keyPrivate: { value: undefined }
+    },
+    label: function() {
+      return this.name || (this.keyPublic ? 'Pub:' + this.keyPublic : 'My Wallet');
+    },
+    oneditprepare: function() {
+        console.log('wallet oneditprepare');
+      $('#node-config-input-keyPublic').typedInput({
+        default: 'str',
+        types: ['msg', 'str'],
+        typeField: $('#node-config-input-keyPublicType')
+      });
+
+      $('#node-config-input-keyPrivate').typedInput({
+        default: 'str',
+        types: ['msg', 'str'],
+        typeField: $('#node-config-input-keyPrivateType')
+      });
+    }
+  });
 </script>
 
 <script type="text/x-red" data-template-name="ethers-wallet">
-    <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
-        <input type="text" id="node-config-input-name" placeholder="">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-keyPublic"><i class="icon-tag"></i> PublicKey</label>
-        <input type="text" id="node-config-input-keyPublic" placeholder="">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-keyPrivate"><i class="fa fa-lock"></i> PrivateKey</label>
-        <input type="text" id="node-config-input-keyPrivate" placeholder="">
-    </div>
+  <div class="form-row">
+      <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
+      <input type="text" id="node-config-input-name" placeholder="">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-keyPublic"><i class="icon-tag"></i> PublicKey</label>
+      <input type="text" id="node-config-input-keyPublic" placeholder="">
+      <input type="hidden" id="node-config-input-keyPublicType">
+  </div>
+  <div class="form-row">
+      <label for="node-config-input-keyPrivate"><i class="fa fa-lock"></i> PrivateKey</label>
+      <input type="text" id="node-config-input-keyPrivate" placeholder="">
+      <input type="hidden" id="node-config-input-keyPrivateType">
+  </div>
 </script>
 
-<script type="text/x-red" data-help-name="ethers-wallet">
-    
-</script>
+<script type="text/x-red" data-help-name="ethers-wallet"></script>

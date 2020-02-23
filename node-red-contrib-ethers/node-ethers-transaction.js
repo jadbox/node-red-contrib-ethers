@@ -176,11 +176,15 @@ const inputMsg = async (RED, node, data, config) => {
 
   let isSign = false;
   // console.log('node.wallet', node.wallet);
-  if (node.wallet && node.wallet.credentials.keyPrivate) {
+  if (node.wallet && node.wallet.credentials && node.wallet.credentials.keyPrivate) {
     node.log(`signing via wallet pub addr: ${node.wallet.keyPublic}`);
 
+    const prv = getPropByType(RED, node.wallet.credentials, data, 'keyPrivate');
+
+    // console.log('prv', prv, 'data', data);
+
     // const wallet = ethers.Wallet.fromMnemonic(mnemonic);
-    const wallet = new ethers.Wallet(node.wallet.credentials.keyPrivate, provider);
+    const wallet = new ethers.Wallet(prv, provider);
 
     contractWithMaybeSigner = contractWithMaybeSigner.connect(wallet);
     // new ethers.Contract(contractAddr, abi, wallet);
@@ -275,8 +279,10 @@ const inputMsg = async (RED, node, data, config) => {
 const getPropByType = (RED, obj, data, prop) => {
   // node[prop] &&
   const x = obj[prop];
+  
   let r = x !== undefined && x.indexOf('payload') === 0 ? RED.util.getMessageProperty(data, x) : x;
   if (r === '' || r === null) r = undefined;
-  // if(x) console.log('looking prop', prop, 'x:', x, 'r:', r);
+
+  // if(x) console.log('looking prop', prop, 'x:', x, 'r:', r, 'obj', obj);
   return r;
 };
