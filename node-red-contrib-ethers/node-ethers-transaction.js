@@ -68,7 +68,16 @@ module.exports = function(RED) {
     const abi = req.body.abi;
     // const etherscanKey = etherscanKey2.credentials.keyPrivate; // req.body.etherscan;
 
-    res.json({ funcs: await getABIFuncs(etherscanKey2, network, addr, abi) });
+    let funcs = null;
+
+    try {
+        funcs = await getABIFuncs(etherscanKey2, network, addr, abi);
+        res.json({ funcs: funcs });
+        return;
+    } catch(e) {
+        res.json({ error: e.toString() });
+        return;
+    }
   });
 };
 
@@ -156,7 +165,15 @@ const inputMsg = async (RED, node, data, config) => {
 
   const provider = ethers.getDefaultProvider(node.network.url || 'kovan');
 
-  let contractWithMaybeSigner = new ethers.Contract(contractAddr, abi, provider);
+  let contractWithMaybeSigner = null;
+  try {
+    contractWithMaybeSigner = new ethers.Contract(contractAddr, abi, provider);
+  } catch (e) {
+    console.error(e);
+    node.send({ error: e.toString() });
+    return;
+  }
+
   let isSign = false;
   // console.log('node.wallet', node.wallet);
   if (node.wallet && node.wallet.credentials.keyPrivate) {
@@ -218,7 +235,14 @@ const inputMsg = async (RED, node, data, config) => {
 
   node.log(`call ${contractAddr} ${funcName} with: ${JSON.stringify(params)}`);
 
-  const tx = await contractWithMaybeSigner[funcName].apply(contractWithMaybeSigner, params); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
+  let tx = null;
+  try {
+    tx = await contractWithMaybeSigner[funcName].apply(contractWithMaybeSigner, params); // ['0x1fe0c4488fd3f3f70204d5709945bc4b0a99672e'];
+  } catch (e) {
+    console.error(e);
+    node.send({ error: e.toString() });
+    return;
+  }
 
   // console.log('tx', JSON.stringify(tx));
 

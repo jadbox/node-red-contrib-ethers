@@ -101,7 +101,7 @@
       // TODO test
       const onABI = (type, value) => {
         if (!abiData) {
-          showError('no abiData on change');
+          // showError('no abiData on change');
           return;
         }
         if (!type || !type.target || !type.target.selectedOptions[0]) return;
@@ -294,6 +294,10 @@
               etherscan: etherscan || '' // config.etherscan ? config.etherscan.credentials.keyPrivate : ''
             },
             function(data) {
+              if(data.error) {
+                showError(data.error);
+                return;
+              }
               // no data? return
               if (!data.funcs) {
                 onABI();
@@ -324,7 +328,7 @@
     oneditsave: function() {
       // console.log('oneditsave transaction');
       const ns = $('#contract-params [id^="node-input-param"]');
-      if (ns.length === 0) console.log('no params found');
+      // if (ns.length === 0) console.log('no params found');
 
       const paramsNew = new Array(ns.length);
       ns.each(function(x) {
@@ -347,7 +351,7 @@
         // flow.set('etherscanKey', $('#node-input-etherscan').val() || '');
       }
 
-      console.log('this.params', this.params);
+      // console.log('this.params', this.params);
     }
   });
 </script>
