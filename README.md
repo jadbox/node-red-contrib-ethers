@@ -4,7 +4,7 @@ This provides a Ethers contract transaction node that uses Ethers.js and Ethersc
 
 It requires a valid Etherscan API key to auto populate the node's configuration panel.
 
-![Screenshot](ethers.png "Screenshot")
+![node-red-contrib-ethers screenshot](ethers.png "node-red-contrib-ethers screenshot")
 
 ## Quick Start
 
@@ -21,4 +21,4 @@ Restart `node-red` and use the Transaction node under the Ethers category.
 
 This project is a creation of [Abridged](http://www.Abridged.io)
 
-- Jonathan Dunlap [@jadbox](https://twitter.com/jadbox)
+- Jonathan Dunlap [@jadbox](https://twitter.com/jadbox) | [jdunlap.eth](https://3box.io/0xffadc07f1bfb127f4312e8652fe94ab0c771b54d)

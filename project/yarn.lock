@@ -294,9 +294,9 @@ ms@2.0.0:
   integrity sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=
 
 node-red-contrib-ethers@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/node-red-contrib-ethers/-/node-red-contrib-ethers-1.0.2.tgz#eb23de1c12d43112d5b1bfcd31cfe0d9bbfe1695"
-  integrity sha512-4AWg/RdX2RQfxExPKqifNp3AhkpiYBTcmCeDPJ6+txj+oa75U8S8vMHXigu0w8wbI4akQkIaCucENghr0llP4Q==
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/node-red-contrib-ethers/-/node-red-contrib-ethers-1.0.3.tgz#1aa1d09177f3ce3a002f5cfbac7f805552c3ef6e"
+  integrity sha512-uzPGofYJCGpGi04elsYaZhT/naw7qlvCYhrUy7oAaJmPTua3GE227wuvx736kGQVVfgdsnN1vY/3mt8LfYhI9w==
   dependencies:
     ethers "^4.0.44"
     etherscan-api "^10.0.5"
