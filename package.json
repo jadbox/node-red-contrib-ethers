@@ -1,14 +1,32 @@
 {
-    "name": "node-red-contrib-ethers-flow",
-    "private": true,
-    "description": "Simply call etherium contracts, powered by Ethers.js and Etherscan",
-    "version": "1.0.0",
+    "name": "node-red-contrib-ethers",
+    "version": "1.0.2",
     "author": "Jonathan Dunlap <jdunlap@outlook.com> (https://https://twitter.com/jadbox)",
+    "description": "Simply call etherium contracts from node-red, powered by Ethers.js and Etherscan",
     "dependencies": {
         "ethers": "^4.0.44",
-        "node-red-contrib-ethers": "file:./node-red-contrib-ethers"
+        "etherscan-api": "^10.0.5"
     },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jadbox/node-red-contrib-ethers"
+    },
+    "license": "MIT",
+    "keywords": [
+        "node-red",
+        "blockchain",
+        "ethers",
+        "ethersjs",
+        "smart",
+        "contracts"
+    ],
     "node-red": {
+        "nodes": {
+            "ethers-wallet": "node-red-contrib-ethers/node-ethers-wallet.js",
+            "ethers-contract": "node-red-contrib-ethers/node-ethers-contract.js",
+            "ethers-transaction": "node-red-contrib-ethers/node-ethers-transaction.js",
+            "ethers-network": "node-red-contrib-ethers/node-ethers-network.js"
+        },
         "settings": {
             "flowFile": "flow.json",
             "credentialsFile": "flow_cred.json"

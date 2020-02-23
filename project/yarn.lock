@@ -97,9 +97,9 @@ escape-string-regexp@^1.0.2:
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
 
 ethers@^4.0.44:
-  version "4.0.44"
-  resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.44.tgz#f2608cbc0b4d099b7e10a01c0efc3a1037013b4e"
-  integrity sha512-kCkMPkpYjBkxzqjcuYUfDY7VHDbf5EXnfRPUOazdqdf59SvXaT+w5lgauxLlk1UjxnAiNfeNS87rkIXnsTaM7Q==
+  version "4.0.45"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.45.tgz#8d4cd764d7c7690836b583d4849203c225eb56e2"
+  integrity sha512-N/Wmc6Mw4pQO+Sss1HnKDCSS6KSCx0luoBMiPNq+1GbOaO3YaZOyplBEhj+NEoYsizZYODtkITg2oecPeNnidQ==
   dependencies:
     aes-js "3.0.0"
     bn.js "^4.4.0"
@@ -293,8 +293,10 @@ ms@2.0.0:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
   integrity sha1-VgiurfwAvmwpAd9fmGF4jeDVl8g=
 
-"node-red-contrib-ethers@file:./node-red-contrib-ethers":
-  version "0.8.0"
+node-red-contrib-ethers@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/node-red-contrib-ethers/-/node-red-contrib-ethers-1.0.2.tgz#eb23de1c12d43112d5b1bfcd31cfe0d9bbfe1695"
+  integrity sha512-4AWg/RdX2RQfxExPKqifNp3AhkpiYBTcmCeDPJ6+txj+oa75U8S8vMHXigu0w8wbI4akQkIaCucENghr0llP4Q==
   dependencies:
     ethers "^4.0.44"
     etherscan-api "^10.0.5"
