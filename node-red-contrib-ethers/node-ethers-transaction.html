@@ -40,7 +40,7 @@
       typeParam6: { value: undefined }
     },
     credentials: {
-      etherscan: { value: undefined, required: false },
+      etherscan: { value: undefined, required: false }
     },
     inputs: 1,
     outputs: 1,
@@ -48,23 +48,36 @@
     align: 'left',
     paletteLabel: 'Transaction',
     hasValue: true,
-    label: function () {
+    label: function() {
       const contract = this.contract ? RED.nodes.node(this.contract).address : '';
       const func = this.apiCall || '';
 
-      const confunc = (contract && func) ? (func + ':' + contract).substr(0, 14) : '';
+      const confunc = contract && func ? (func + ':' + contract).substr(0, 14) : '';
 
       return this.name || confunc || 'Ethereum Transaction';
     },
-    oneditprepare: function () {
+    oneditprepare: function() {
       const node = this;
+
+      const showError = x => {
+        console.error(x);
+        $('#node-input-apiCall').empty();
+        $('#node-input-apiCall').append(
+          $('<option></option>')
+            .val('')
+            .text(x)
+            .prop('selected', true)
+        );
+        $('#contract-params').html(`<b>${x}</b><br/>`);
+        return;
+      };
       // console.log('node', RED.settings, RED.settings.etherscanKey);
 
       // console.log('this', this.context);
 
-      if(!$('#node-input-etherscan').val() && window.etherscanKey) {
+      if (!$('#node-input-etherscan').val() && window.etherscanKey) {
         // flow.set('etherscanKey', $('#node-input-etherscan').val() || '');
-        $('#node-input-etherscan').val( window.etherscanKey );
+        $('#node-input-etherscan').val(window.etherscanKey);
       }
 
       // console.log('oneditprepare');
@@ -88,8 +101,7 @@
       // TODO test
       const onABI = (type, value) => {
         if (!abiData) {
-          console.error('no abiData on change');
-          $('#contract-params').html(`<b>No contract ABI found</b><br/>`);
+          showError('no abiData on change');
           return;
         }
         if (!type || !type.target || !type.target.selectedOptions[0]) return;
@@ -99,7 +111,7 @@
 
         const abiFuncI = abiData.filter(x => x.name === selectedFunc)[0];
 
-        if(!abiFuncI) {
+        if (!abiFuncI) {
           console.log('no matching function');
           return;
         }
@@ -114,8 +126,7 @@
           $('#optionalEther').show();
           $('#optionalFrom').show();
           $('#optionalLimit').show();
-        }
-        else {
+        } else {
           $('#optionalEther').hide();
           $('#node-input-ether').val('');
 
@@ -130,9 +141,10 @@
 
         const p = abiFuncI.inputs.map((mi, i) => Object.assign({ label: mi.name || mi.type, i: i }, mi));
 
+        // console.log('abiFuncI',abiFuncI);
         // === set status label
         $('#node-input-api-info').html(
-          `<label for="apiCallInfo"><i class="icon-tag"></i> API info:</label><input id="apiCallInfo" type="text" readonly value="Mutability=${abiFuncI.stateMutability}, Payable=${abiFuncI.payable}"></input>`
+          `<label for="apiCallInfo"><i class="icon-tag"></i> API info:</label><textarea id="apiCallInfo" type="text" readonly value="">Mutability=${abiFuncI.stateMutability}, Payable=${!!abiFuncI.payable}, Constant=${!!abiFuncI.constant}</textarea>`
         );
         // ===
 
@@ -171,7 +183,6 @@
             typeField: $(`#node-input-typeParam${x.i}`)
           });
         });
-
       };
 
       $('#node-input-apiCall').on('change', (type, value) => {
@@ -204,12 +215,12 @@
       };
 
       $('#node-input-network').on('change', (type, value) => {
-        // this.node = 
+        // this.node =
         $('#node-input-contract').trigger('change');
       });
 
       $('#node-input-etherscan').on('change', (type, value) => {
-        // this.node = 
+        // this.node =
         $('#node-input-contract').trigger('change');
       });
 
@@ -228,14 +239,14 @@
           return;
         }
         const address = RED.nodes.node(t).address;
-        
+
         let network = this.network ? RED.nodes.node(this.network).url : undefined;
-        if(!network) {
+        if (!network) {
           const n = $('#node-input-network').val();
 
           const netNode = n ? RED.nodes.node(n) : null;
 
-          if(netNode && netNode.url) network = netNode.url;
+          if (netNode && netNode.url) network = netNode.url;
           // console.log('network node', n, a, a.url);
         }
 
@@ -244,7 +255,7 @@
         // console.log('this', this.credentials, etherscan);
 
         // get the key right from the input if it hasn't been saved in the Node yet
-        if(!etherscan) {
+        if (!etherscan) {
           // console.log('no etherscan key field', etherscan, $('node-input-etherscan'));
           etherscan = $('#node-input-etherscan').val();
 
@@ -255,6 +266,11 @@
         // console.log('change node', address);
 
         const contractNodeAbi = RED.nodes.node(t).abi || null;
+
+        if (!contractNodeAbi && !etherscan) {
+          showError('No Etherscan key or ABI provided.');
+          return;
+        }
         /* if (!!contractNodeAbi) {
           console.log('contractNodeAbi', contractNodeAbi);
           decorateFuncNames(contractNodeAbi);
@@ -264,69 +280,74 @@
           decorateFuncNames(abiData);
         } else {
           const requestKey = address + ':' + network + ':' + etherscan;
-          if(requestDebounce[requestKey]) return;
+          if (requestDebounce[requestKey]) return;
           // console.log('etherscan address:', requestKey);
 
           requestDebounce[requestKey] = true;
 
-          $.post('abi', {
-            address: address,
-            network: network || '',
-            abi: contractNodeAbi,
-            etherscan: etherscan || '' // config.etherscan ? config.etherscan.credentials.keyPrivate : ''
-          }, function (data) {
-            // abiDataAddress
-            abiDataAddress = address;
-            
-            // console.log('serialports test', data);
-            if(!data.funcs) {
+          $.post(
+            'abi',
+            {
+              address: address,
+              network: network || '',
+              abi: contractNodeAbi,
+              etherscan: etherscan || '' // config.etherscan ? config.etherscan.credentials.keyPrivate : ''
+            },
+            function(data) {
+              // no data? return
+              if (!data.funcs) {
+                onABI();
+                return;
+              }
+              // abiDataAddress
+              abiDataAddress = address;
+
+              // console.log('serialports test', data);
+
+              /// $('#node-input-apiCall').typedInput({default: '', types:data.funcs.map(x=>x.name)});
+              const t = data.funcs.map(x => x.name);
+              abiData = data.funcs;
+              // console.log('got data', abiData);
+              decorateFuncNames(abiData);
+
+              // Populate params
               onABI();
-              return;
             }
-
-            /// $('#node-input-apiCall').typedInput({default: '', types:data.funcs.map(x=>x.name)});
-            const t = data.funcs.map(x => x.name);
-            abiData = data.funcs;
-            // console.log('got data', abiData);
-            decorateFuncNames(abiData);
-
-            // Populate params
-            onABI();
-          });
+          );
         }
       });
       // $("#node-input-ether").typedInput({ default: 'msg', types: ['msg','str'], typeField: $("#node-input-etherType") });
     },
-    oneditcancel: function () {
+    oneditcancel: function() {
       // console.log('oneditcancel transaction');
     },
-    oneditsave:  () => {
+    oneditsave: function() {
       // console.log('oneditsave transaction');
       const ns = $('#contract-params [id^="node-input-param"]');
       if (ns.length === 0) console.log('no params found');
 
-      const params = new Array(ns.length);
-      ns.each(function (x) {
+      const paramsNew = new Array(ns.length);
+      ns.each(function(x) {
         const n = $(this)[0];
         const fieldIndex = parseInt(n.id.replace('node-input-param', ''));
         const val = n.value;
-        params[fieldIndex] = val;
+        paramsNew[fieldIndex] = val;
         // console.log('field', fieldIndex, val);
       });
 
-      this.params = params;
+      this.params = paramsNew;
+      $('#node-input-params').val(this.params);
 
-      
       // console.log('flow.get', this);
 
       // console.log('flow.get', flow.get('etherscanKey'));
 
-      if(!!$('#node-input-etherscan').val()) {
+      if (!!$('#node-input-etherscan').val()) {
         window.etherscanKey = $('#node-input-etherscan').val();
         // flow.set('etherscanKey', $('#node-input-etherscan').val() || '');
-      } 
-      
-      // console.log('this.params', this.params);
+      }
+
+      console.log('this.params', this.params);
     }
   });
 </script>
@@ -348,110 +369,111 @@
 </style>
 <script type="text/x-red" data-template-name="ethers-transaction">
 
-  <h4 class="section">General</h4>
+    <h4 class="section">General</h4>
 
-  <div class="form-row">
-      <label for="node-input-name"><i class="icon-tag"></i> Label [optional]</label>
-      <input type="text" id="node-input-name" placeholder="">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Label [optional]</label>
+        <input type="text" id="node-input-name" placeholder="">
+    </div>
+    <div class="form-row">
+      <label for="node-input-etherscan"><i class="icon-tag"></i> Etherscan API</label>
+      <input type="text" id="node-input-etherscan" placeholder="">
+      <div class="input-info">Get your key from etherscan.io</div>
   </div>
-  <div class="form-row">
-    <label for="node-input-etherscan"><i class="icon-tag"></i> Etherscan API</label>
-    <input type="text" id="node-input-etherscan" placeholder="">
-    <div class="input-info">Get your key from etherscan.io</div>
-</div>
-  <div class="form-row">
-      <label for="node-input-network"><i class="icon-tag"></i> Network</label>
-      <input type="text" id="node-input-network" placeholder="">
-  </div>
-  <div class="form-row">
-      <label for="node-input-wallet"><i class="icon-tag"></i> Wallet [optional]</label>
-      <input type="text" id="node-input-wallet" placeholder="">
-      <div class="input-info">This wallet will sign the transaction</div>
-  </div>
-  <div class="form-row">
-    <label for="node-input-output"><i class="icon-tag"></i> Output (opional)</label>
-    <input type="text" id="node-input-output" style="width:70%;" placeholder="payload">
-    <input type="hidden" id="node-input-outputType">
-  </div>
+    <div class="form-row">
+        <label for="node-input-network"><i class="icon-tag"></i> Network</label>
+        <input type="text" id="node-input-network" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-wallet"><i class="icon-tag"></i> Wallet [optional]</label>
+        <input type="text" id="node-input-wallet" placeholder="">
+        <div class="input-info">This wallet will sign the transaction</div>
+    </div>
+    <div class="form-row">
+      <label for="node-input-output"><i class="icon-tag"></i> Output (opional)</label>
+      <input type="text" id="node-input-output" style="width:70%;" placeholder="payload">
+      <input type="hidden" id="node-input-outputType">
+    </div>
 
-  <h4 class="section">Contract</h4>
+    <h4 class="section">Contract</h4>
 
-  <div class="form-row">
-      <label for="node-input-contract"><i class="icon-tag"></i> Contract</label>
-      <input type="text" id="node-input-contract" placeholder="">
-  </div>
-  <div class="form-row">
-      <label for="node-input-apiCall"><i class="icon-tag"></i> API Call</label>
-      <select id="node-input-apiCall" style="width:260px">
-          <option /><option /><option /><option /><option /><option /><option /><option /><option />
-          <option /><option /><option /><option /><option /><option /><option /><option /><option />
-          <option /><option /><option /><option /><option /><option /><option /><option /><option />
-          <option /><option /><option /><option /><option /><option /><option /><option /><option />
-      </select>
+    <div class="form-row">
+        <label for="node-input-contract"><i class="icon-tag"></i> Contract</label>
+        <input type="text" id="node-input-contract" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-apiCall"><i class="icon-tag"></i> API Call</label>
+        <select id="node-input-apiCall" style="width:260px">
+            <option /><option /><option /><option /><option /><option /><option /><option /><option />
+            <option /><option /><option /><option /><option /><option /><option /><option /><option />
+            <option /><option /><option /><option /><option /><option /><option /><option /><option />
+            <option /><option /><option /><option /><option /><option /><option /><option /><option />
+        </select>
 
-  </div>
+    </div>
 
-  <div class="form-row">
-      <div id="node-input-api-info">
+    <div class="form-row">
+        <div id="node-input-api-info">
+        </div>
+    </div>
+    <input type="hidden" id="node-input-params">
+    <div id="contract-params">
+      <div class="form-row">
+        <label for="node-input-param0"><i class="icon-tag"></i>0.</label>
+        <input type="text" id="node-input-param0" placeholder="">
+        <input type="hidden" id="node-input-typeParam0">
       </div>
-  </div>
-  <div id="contract-params">
-    <div class="form-row">
-      <label for="node-input-param0"><i class="icon-tag"></i>0.</label>
-      <input type="text" id="node-input-param0" placeholder="">
-      <input type="hidden" id="node-input-typeParam0">
+      <div class="form-row">
+        <label for="node-input-param1"><i class="icon-tag"></i>1.</label>
+        <input type="text" id="node-input-param1" placeholder="">
+        <input type="hidden" id="node-input-typeParam1">
+      </div>
+      <div class="form-row">
+        <label for="node-input-param2"><i class="icon-tag"></i>2.</label>
+        <input type="text" id="node-input-param2" placeholder="">
+        <input type="hidden" id="node-input-typeParam2">
+      </div>
+      <div class="form-row">
+        <label for="node-input-param3"><i class="icon-tag"></i>3.</label>
+        <input type="text" id="node-input-param3" placeholder="">
+        <input type="hidden" id="node-input-typeParam3">
+      </div>
+      <div class="form-row">
+        <label for="node-input-param4"><i class="icon-tag"></i>4.</label>
+        <input type="text" id="node-input-param4" placeholder="">
+        <input type="hidden" id="node-input-typeParam4">
+      </div>
+      <div class="form-row">
+        <label for="node-input-param5"><i class="icon-tag"></i>5.</label>
+        <input type="text" id="node-input-param5" placeholder="">
+        <input type="hidden" id="node-input-typeParam5">
+      </div>
+      <div class="form-row">
+        <label for="node-input-param6"><i class="icon-tag"></i>6.</label>
+        <input type="text" id="node-input-param6" placeholder="">
+        <input type="hidden" id="node-input-typeParam6">
+      </div>
     </div>
-    <div class="form-row">
-      <label for="node-input-param1"><i class="icon-tag"></i>1.</label>
-      <input type="text" id="node-input-param1" placeholder="">
-      <input type="hidden" id="node-input-typeParam1">
-    </div>
-    <div class="form-row">
-      <label for="node-input-param2"><i class="icon-tag"></i>2.</label>
-      <input type="text" id="node-input-param2" placeholder="">
-      <input type="hidden" id="node-input-typeParam2">
-    </div>
-    <div class="form-row">
-      <label for="node-input-param3"><i class="icon-tag"></i>3.</label>
-      <input type="text" id="node-input-param3" placeholder="">
-      <input type="hidden" id="node-input-typeParam3">
-    </div>
-    <div class="form-row">
-      <label for="node-input-param4"><i class="icon-tag"></i>4.</label>
-      <input type="text" id="node-input-param4" placeholder="">
-      <input type="hidden" id="node-input-typeParam4">
-    </div>
-    <div class="form-row">
-      <label for="node-input-param5"><i class="icon-tag"></i>5.</label>
-      <input type="text" id="node-input-param5" placeholder="">
-      <input type="hidden" id="node-input-typeParam5">
-    </div>
-    <div class="form-row">
-      <label for="node-input-param6"><i class="icon-tag"></i>6.</label>
-      <input type="text" id="node-input-param6" placeholder="">
-      <input type="hidden" id="node-input-typeParam6">
-    </div>
-  </div>
 
-  <h4 class="section">Optional Overrides</h4>
+    <h4 class="section">Optional Overrides</h4>
 
-  <div class="form-row" id="optionalFrom">
-      <label for="node-input-address"><i class="icon-tag"></i> From Address</label>
-      <input type="text" id="node-input-address" style="width:70%;" placeholder="">
-      <input type="hidden" id="node-input-addressType">
-      <div class="input-info">Leave empty to use wallet's public address</div>
-  </div>
+    <div class="form-row" id="optionalFrom">
+        <label for="node-input-address"><i class="icon-tag"></i> From Address</label>
+        <input type="text" id="node-input-address" style="width:70%;" placeholder="">
+        <input type="hidden" id="node-input-addressType">
+        <div class="input-info">Leave empty to use wallet's public address</div>
+    </div>
 
-  <div class="form-row" id="optionalLimit">
-    <label for="node-input-gaslimit"><i class="icon-tag"></i> Gas Limit</label>
-    <input type="text" id="node-input-gaslimit" style="width:70%;" placeholder="">
-  </div>
+    <div class="form-row" id="optionalLimit">
+      <label for="node-input-gaslimit"><i class="icon-tag"></i> Gas Limit</label>
+      <input type="text" id="node-input-gaslimit" style="width:70%;" placeholder="">
+    </div>
 
-  <div class="form-row" id="optionalEther">
-    <label for="node-input-ether"><i class="icon-tag"></i> Pay Ether</label>
-    <input type="text" id="node-input-ether" style="width:70%;" placeholder="">
-    <input type="hidden" id="node-input-etherType">
-  </div>
+    <div class="form-row" id="optionalEther">
+      <label for="node-input-ether"><i class="icon-tag"></i> Pay Ether</label>
+      <input type="text" id="node-input-ether" style="width:70%;" placeholder="">
+      <input type="hidden" id="node-input-etherType">
+    </div>
 </script>
 
 <script type="text/x-red" data-help-name="ethers-transaction">
