@@ -274,7 +274,7 @@ const inputMsg = async (RED, node, data, config) => {
   // node.log(tx);
   node.log(`result ${contractAddr}: "${result}"`);
 
-  let msg = {};
+  let msg = data || {};
   RED.util.setMessageProperty(msg, config.output || 'payload', result, true);
   // console.log('-', msg, config.output, result);
   // console.log('msgOutput');
