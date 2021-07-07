@@ -334,8 +334,8 @@
       ns.each(function(x) {
         const n = $(this)[0];
         const fieldIndex = parseInt(n.id.replace('node-input-param', ''));
-        const val = n.value;
-        paramsNew[fieldIndex] = val;
+        let foundType = $('#node-input-typeParam' + fieldIndex).val();
+        paramsNew[fieldIndex] = { type: foundType, val: n.value };
         // console.log('field', fieldIndex, val);
       });
 
