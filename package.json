@@ -4,7 +4,7 @@
     "author": "Jonathan Dunlap <jdunlap@outlook.com> (https://https://twitter.com/jadbox)",
     "description": "Simply call etherium contracts from node-red, powered by Ethers.js and Etherscan",
     "dependencies": {
-        "ethers": "^4.0.44",
+        "ethers": "^5.4.1",
         "etherscan-api": "^10.0.5"
     },
     "repository": {

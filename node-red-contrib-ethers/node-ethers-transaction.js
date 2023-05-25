@@ -93,7 +93,10 @@ async function getABIFuncs(etherscanKey, network, address, abi) {
   var iface = new ethers.utils.Interface(abi2);
 
   // console.log('iface', iface.functions);
-  const abiFunctions = iface.abi.filter(x => x.type === 'function');
+  // const abiFunctions = iface.abi.filter(x => x.type === 'function');
+  const abiFunctions = Object.values(iface.functions).map( x => {
+    return JSON.parse(JSON.stringify(x));;
+  });
 
   return abiFunctions;
 }
